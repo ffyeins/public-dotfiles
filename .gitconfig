@@ -1,0 +1,119 @@
+[user]
+	email = 86212224+ffyeins@users.noreply.github.com
+	name = fran
+
+[init]
+	defaultBranch = main
+
+[core]
+	editor = nvim
+	pager = delta
+
+[interactive]
+	# makes `git add -p` use delta; --color-only is required here
+	diffFilter = delta --color-only
+
+[merge]
+    tool = nvimdiff
+	# show common ancestor in conflict markers, not just both sides
+	conflictStyle = zdiff3
+[mergetool "nvimdiff"]
+    cmd = nvim -d $LOCAL $REMOTE $MERGED -c '$wincmd w' -c 'wincmd J'
+[mergetool]
+    prompt = false
+	keepBackup = false
+
+[diff]
+	tool = nvimdiff
+	# better rename/move detection than default myers
+	algorithm = histogram
+	# color moved blocks separately from real adds/removes
+	colorMoved = zebra
+	# i/ w/ c/ prefixes instead of a/ b/ so you know index vs worktree
+	mnemonicPrefix = true
+[difftool]
+	prompt = false
+
+[delta]
+	navigate = true
+	line-numbers = true
+	syntax-theme = Visual Studio Dark+
+
+	# changed lines: muted tint + syntax colors on top
+	minus-style                   = syntax "#3a1e22"
+	minus-emph-style              = syntax "#7d2e33"
+	plus-style                    = syntax "#162a1e"
+	plus-emph-style               = syntax "#2e6b40"
+
+	# gutter
+	line-numbers-minus-style      = "#e06c75"
+	line-numbers-plus-style       = "#7ec384"
+	line-numbers-zero-style       = "#5c6370"
+	line-numbers-left-format      = "{nm:>4} │"
+	line-numbers-right-format     = "{np:>4} │ "
+	line-numbers-left-style       = "#4b5263"
+	line-numbers-right-style      = "#4b5263"
+
+	# quieter hunk header
+	hunk-header-style             = line-number syntax
+	hunk-header-decoration-style  = "#3e4451" ul
+	hunk-header-line-number-style = "#7f848e"
+
+	file-style                    = bold "#d4d4d4"
+	file-decoration-style         = "#3e4451" ul
+
+	# don't wrap long lines onto a new row
+	wrap-max-lines = 0
+
+[push]
+	# no more "git push -u origin <branch>" on first push
+	autoSetupRemote = true
+
+[pull]
+	# rebase instead of creating an accidental merge commit
+	rebase = true
+
+[fetch]
+	# fetch every remote, not just origin
+	all = true
+
+[rebase]
+	# stash dirty worktree before rebase, pop after
+	autoStash = true
+	# honor fixup!/squash! commits without passing --autosquash
+	autoSquash = true
+	# move dependent local branches along when rebasing a stack
+	updateRefs = true
+
+[commit]
+	# show full diff in the commit message editor
+	verbose = true
+
+[log]
+	# unambiguous timestamps instead of locale-dependent ones
+	date = iso
+
+[status]
+	# list files inside untracked dirs, not just the dir name
+	showUntrackedFiles = all
+
+[help]
+	# ask "did you mean X?" on typo instead of just failing
+	autocorrect = prompt
+
+[column]
+	# print branch/tag lists in columns
+	ui = auto
+
+[tag]
+	# sort v1.10 after v1.9 instead of alphabetically
+	sort = version:refname
+
+[branch]
+	sort = -committerdate
+[alias]
+	st = status
+	co = checkout
+	ci = commit
+	br = branch
+	cm = commit -m

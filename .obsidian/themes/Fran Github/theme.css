@@ -1,0 +1,405 @@
+/* GitHub Light Theme for Obsidian
+ * Based on github-markdown-css by sindresorhus
+ * Adapted for Obsidian by Fran
+ */
+
+.theme-light
+{
+    /* === GitHub Light Color Palette === */
+    --gh-text-primary: #1f2328;
+    --gh-text-secondary: #59636e;
+    --gh-text-link: #0969da;
+    --gh-text-danger: #d1242f;
+    
+    --gh-bg-primary: #ffffff;
+    --gh-bg-secondary: #f6f8fa;
+    --gh-bg-tertiary: #f6f8fa;
+    --gh-bg-overlay: #818b981f;
+    --gh-bg-highlight: #fff8c5;
+    
+    --gh-border-default: #d1d9e0;
+    --gh-border-muted: #d1d9e0b3;
+    
+    --gh-shadow: #d1d9e0b3;
+
+    /* === Obsidian Base Variables === */
+    --background-primary: var(--gh-bg-primary);
+    --background-primary-alt: var(--gh-bg-primary);
+    --background-secondary: var(--gh-bg-secondary);
+    --background-secondary-alt: var(--gh-bg-tertiary);
+    --background-modifier-border: var(--gh-border-muted);
+    
+    --text-normal: var(--gh-text-primary);
+    --text-muted: var(--gh-text-secondary);
+    --text-faint: var(--gh-text-secondary);
+    --text-accent: var(--gh-text-link);
+    --text-accent-hover: var(--gh-text-link);
+    
+    --interactive-accent: var(--gh-text-link);
+    --interactive-accent-hover: var(--gh-text-link);
+    
+    /* === Typography === */
+    --font-text-theme: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans", Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji";
+    --font-monospace-theme: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
+    
+    --font-text-size: 16px;
+    --line-height-normal: 1.5;
+    
+    /* === Headings === */
+    --h1-color: var(--gh-text-primary);
+    --h2-color: var(--gh-text-primary);
+    --h3-color: var(--gh-text-primary);
+    --h4-color: var(--gh-text-primary);
+    --h5-color: var(--gh-text-primary);
+    --h6-color: var(--gh-text-primary);
+    
+    --h1-weight: 600;
+    --h2-weight: 600;
+    --h3-weight: 600;
+    --h4-weight: 600;
+    --h5-weight: 600;
+    --h6-weight: 600;
+    
+    /* === Links === */
+    --link-color: var(--gh-text-link);
+    --link-color-hover: var(--gh-text-link);
+    --link-decoration: none;
+    --link-decoration-hover: underline;
+    --link-external-decoration: none;
+    --link-external-decoration-hover: underline;
+    
+    /* === Code === */
+    --code-normal: var(--gh-text-primary);
+    --code-background: var(--gh-bg-overlay);
+    --code-size: 0.85em;
+    
+    /* === Blockquotes === */
+    --blockquote-border-color: var(--gh-border-default);
+    --blockquote-color: var(--gh-text-secondary);
+    
+    /* === Tables === */
+    --table-border-color: var(--gh-border-default);
+    --table-header-background: var(--gh-bg-primary);
+    --table-header-background-hover: var(--gh-bg-secondary);
+    --table-row-even-background: var(--gh-bg-primary);
+    --table-row-odd-background: var(--gh-bg-primary);
+    --table-row-background-hover: var(--gh-bg-secondary);
+    
+    /* === Tags === */
+    --tag-color: var(--gh-text-primary);
+    --tag-background: var(--gh-bg-secondary);
+    --tag-background-hover: var(--gh-bg-tertiary);
+    --tag-decoration: none;
+    --tag-decoration-hover: none;
+    --tag-padding-x: 0.5em;
+    --tag-padding-y: 0.2em;
+    --tag-radius: 6px;
+    
+    /* === Checkbox === */
+    --checkbox-color: var(--gh-text-link);
+    --checkbox-color-hover: var(--gh-text-link);
+    --checkbox-border-color: var(--gh-border-default);
+    --checkbox-border-color-hover: var(--gh-text-link);
+    --checkbox-radius: 3px;
+    
+    /* === Highlights === */
+    --text-highlight-bg: var(--gh-bg-highlight);
+    --text-highlight-fg: var(--gh-text-primary);
+    
+    /* === Selection === */
+    --text-selection: rgba(129, 139, 152, 0.25);
+    
+    /* === Bold and Italic === */
+    --bold-color: var(--gh-text-primary);
+    --bold-weight: 600;
+    --italic-color: var(--gh-text-primary);
+    
+    /* === Buttons === */
+    --background-modifier-hover: var(--gh-bg-secondary);
+    --background-modifier-active-hover: var(--gh-bg-tertiary);
+}
+
+/* === Font Override === */
+body
+{
+    --font-text: var(--font-text-theme);
+    --font-monospace: var(--font-monospace-theme);
+}
+
+/* === Headings === */
+.markdown-preview-view h1,
+.cm-header-1
+{
+    font-weight: 600;
+    padding-bottom: 0.3em;
+    border-bottom: 1px solid var(--gh-border-muted);
+}
+
+.markdown-preview-view h2,
+.cm-header-2
+{
+    font-weight: 600;
+    padding-bottom: 0.3em;
+    border-bottom: 1px solid var(--gh-border-muted);
+}
+
+.markdown-preview-view h3,
+.markdown-preview-view h4,
+.markdown-preview-view h5,
+.markdown-preview-view h6,
+.cm-header-3,
+.cm-header-4,
+.cm-header-5,
+.cm-header-6
+{
+    font-weight: 600;
+}
+
+/* === Links === */
+.markdown-preview-view a,
+.cm-link
+{
+    color: var(--gh-text-link);
+    text-decoration: none;
+}
+
+.markdown-preview-view a:hover,
+.cm-link:hover
+{
+    text-decoration: underline;
+}
+
+/* === Code Blocks === */
+.markdown-preview-view code,
+.cm-inline-code
+{
+    background-color: var(--gh-bg-overlay);
+    border-radius: 6px;
+    padding: 0.2em 0.4em;
+    font-size: var(--code-size);
+}
+
+.markdown-preview-view pre code
+{
+    background-color: var(--gh-bg-secondary);
+    border-radius: 6px;
+    padding: 1em;
+    display: block;
+}
+
+/* === Blockquotes === */
+.markdown-preview-view blockquote,
+.cm-quote
+{
+    border-left: 0.25em solid var(--gh-border-default);
+    color: var(--gh-text-secondary);
+    padding-left: 1em;
+}
+
+/* === Tables === */
+.markdown-preview-view table
+{
+    border-spacing: 0;
+    border-collapse: collapse;
+    border: 1px solid var(--gh-border-default);
+}
+
+.markdown-preview-view th
+{
+    font-weight: 600;
+    padding: 0.375rem 0.8125rem;
+    border: 1px solid var(--gh-border-default);
+    background-color: var(--gh-bg-primary);
+}
+
+.markdown-preview-view td
+{
+    padding: 0.375rem 0.8125rem;
+    border: 1px solid var(--gh-border-default);
+}
+
+.markdown-preview-view tr:nth-child(2n)
+{
+    background-color: var(--gh-bg-secondary);
+}
+
+/* === Horizontal Rule === */
+.markdown-preview-view hr,
+.cm-line hr
+{
+    height: 0.25em;
+    padding: 0;
+    margin: 1.5rem 0;
+    background-color: var(--gh-border-default);
+    border: 0;
+}
+
+/* === Lists === */
+.markdown-preview-view ul,
+.markdown-preview-view ol
+{
+    padding-left: 2em;
+}
+
+/* === Task Lists === */
+.markdown-preview-view .task-list-item-checkbox
+{
+    margin-right: 0.5em;
+}
+
+input[type=checkbox]
+{
+    border: 1px solid var(--gh-border-default);
+    border-radius: var(--checkbox-radius);
+}
+
+input[type=checkbox]:checked
+{
+    background-color: var(--gh-text-link);
+    border-color: var(--gh-text-link);
+}
+
+/* === Highlights/Marks === */
+.markdown-preview-view mark,
+.cm-highlight
+{
+    background-color: var(--gh-bg-highlight);
+    color: var(--gh-text-primary);
+}
+
+/* === Bold and Strong === */
+.markdown-preview-view strong,
+.cm-strong
+{
+    font-weight: 600;
+}
+
+/* === Tags === */
+.tag
+{
+    background-color: var(--gh-bg-secondary);
+    border-radius: 6px;
+    color: var(--gh-text-link);
+    padding: 0.2em 0.5em;
+    text-decoration: none;
+}
+
+.tag:hover
+{
+    background-color: var(--gh-bg-tertiary);
+    text-decoration: none;
+}
+
+/* === File Explorer === */
+.nav-file-title,
+.nav-folder-title
+{
+    color: var(--gh-text-primary);
+}
+
+.nav-file-title:hover,
+.nav-folder-title:hover
+{
+    background-color: var(--gh-bg-secondary);
+}
+
+.nav-file-title.is-active
+{
+    background-color: var(--gh-bg-secondary);
+    color: var(--gh-text-link);
+}
+
+/* === Search === */
+.search-result-file-matched-text
+{
+    background-color: var(--gh-bg-highlight);
+    color: var(--gh-text-primary);
+}
+
+/* === Settings === */
+.vertical-tab-header-group-title
+{
+    color: var(--gh-text-secondary);
+    font-weight: 600;
+}
+
+.vertical-tab-nav-item
+{
+    color: var(--gh-text-primary);
+}
+
+.vertical-tab-nav-item:hover
+{
+    background-color: var(--gh-bg-secondary);
+}
+
+.vertical-tab-nav-item.is-active
+{
+    background-color: var(--gh-bg-secondary);
+    color: var(--gh-text-link);
+}
+
+/* === Sidebar === */
+.workspace-leaf-content[data-type="search"] .search-result-file-title,
+.workspace-leaf-content[data-type="backlink"] .tree-item-self
+{
+    color: var(--gh-text-primary);
+}
+
+/* === Graph View === */
+.graph-view.color-fill
+{
+    color: var(--gh-text-link);
+}
+
+/* === Editor Cursor === */
+.cm-cursor
+{
+    border-left-color: var(--gh-text-primary);
+}
+
+/* === Active Line Highlight === */
+.cm-active
+{
+    background-color: rgba(129, 139, 152, 0.08);
+}
+
+/* === Selection === */
+::selection
+{
+    background-color: var(--text-selection);
+}
+
+/* === Scrollbars === */
+::-webkit-scrollbar-thumb
+{
+    background-color: var(--gh-border-muted);
+}
+
+::-webkit-scrollbar-thumb:hover
+{
+    background-color: var(--gh-border-default);
+}
+
+/* === Additional GitHub-style refinements === */
+.markdown-preview-view img
+{
+    max-width: 100%;
+    box-sizing: content-box;
+}
+
+.markdown-preview-view pre
+{
+    background-color: var(--gh-bg-secondary);
+    border-radius: 6px;
+    padding: 1em;
+}
+
+/* === Focus Outline === */
+a:focus,
+button:focus,
+input:focus
+{
+    outline: 2px solid var(--gh-text-link);
+    outline-offset: -2px;
+}

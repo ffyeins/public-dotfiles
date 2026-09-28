@@ -1,0 +1,6 @@
+#!/bin/bash
+
+borders "active_color=glow(0x80ffffff)" \
+        "inactive_color=glow(0x80000000)" \
+        width=3.0 \
+        style=round

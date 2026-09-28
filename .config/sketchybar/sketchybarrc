@@ -1,0 +1,38 @@
+#!/bin/bash
+
+source "$CONFIG_DIR/colors.sh"
+
+PLUGIN_DIR="$CONFIG_DIR/plugins"
+ITEM_DIR="$CONFIG_DIR/items"
+
+sketchybar --bar height=30        \
+                 blur_radius=30   \
+                 position=top     \
+                 sticky=off       \
+                 padding_left=10  \
+                 padding_right=10 \
+                 color=0x15000000
+
+sketchybar --default icon.font="Roboto Mono:Bold:16.0"  \
+                     icon.color=$WHITE                 \
+                     icon.y_offset=1                  \
+                     label.font="Roboto Mono:Bold:16.0" \
+                     label.color=$WHITE                \
+                     background.color=$ITEM_BG_COLOR       \
+                     background.corner_radius=5            \
+                     background.height=24                  \
+                     padding_left=5                        \
+                     padding_right=5                       \
+                     label.padding_left=4                  \
+                     label.padding_right=10                \
+                     icon.padding_left=10                  \
+                     icon.padding_right=4
+
+# Compile hot-path event handler into a single file
+"$CONFIG_DIR/build.sh"
+
+# -- Left Side Items --
+source $ITEM_DIR/spaces.sh
+# source $ITEM_DIR/front_app.sh
+
+sketchybar --update

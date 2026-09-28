@@ -1,0 +1,21 @@
+/* Horizontal scroll for code blocks instead of line wrapping */
+body {
+  --code-white-space: pre;
+}
+
+/* Reading view: scroll on code, not pre — keeps copy button fixed */
+.markdown-rendered pre {
+  position: relative;
+  overflow: visible;
+}
+
+.markdown-rendered pre > code {
+  display: block;
+  overflow-x: auto;
+  white-space: pre !important;
+}
+
+/* Editor / Live Preview: no-wrap in code blocks */
+.HyperMD-codeblock.cm-line {
+  white-space: pre !important;
+}

@@ -1,0 +1,18 @@
+{
+  "livePreview": false,
+  "showIndentGuide": false,
+  "spellcheck": false,
+  "showInlineTitle": false,
+  "useMarkdownLinks": true,
+  "attachmentFolderPath": "./",
+  "newLinkFormat": "relative",
+  "alwaysUpdateLinks": true,
+  "promptDelete": false,
+  "defaultViewMode": "preview",
+  "pdfExportSettings": {
+    "pageSize": "A4",
+    "landscape": false,
+    "margin": "0",
+    "downscalePercent": 80
+  }
+}

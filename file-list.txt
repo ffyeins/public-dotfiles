@@ -1,0 +1,12 @@
+.config/
+.gitconfig
+.obsidian/
+.tmux.conf
+.zshenv
+.zshrc
+.zshrc.macos
+docs/
+fonts/
+iterm2/
+scripts/run_caffeinate.sh
+scripts/tmux_copy_last_output.sh

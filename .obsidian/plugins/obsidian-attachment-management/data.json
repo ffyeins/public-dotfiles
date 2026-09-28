@@ -1,0 +1,18 @@
+{
+  "language": "en",
+  "attachPath": {
+    "attachmentRoot": "${notepath}",
+    "attachmentPath": "_assets",
+    "attachFormat": "${notename}-${date}"
+  },
+  "dateFormat": "YYYYMMDDHHmmss",
+  "excludeExtensionPattern": "",
+  "autoRenameAttachment": true,
+  "excludedPaths": "",
+  "excludePathsArray": [],
+  "excludeSubpaths": false,
+  "originalNameStorage": [],
+  "overridePath": {},
+  "disableNotification": false,
+  "rootPath": "onNotePath"
+}

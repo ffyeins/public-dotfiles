@@ -1,0 +1,53 @@
+### Normal
+black		191A1C
+red		FA6675
+green		6AAB73
+yellow		B3AE60
+blue		57AAF7
+magenta		C77DBB
+cyan		2AACB8
+white		BCBEC4
+
+### Bright
+black		595959
+red		FF4050
+green		4FC414
+yellow		E5BF00
+blue		1FB0FF
+magenta		ED7EED
+cyan		00E5E5
+white		FFFFFF
+
+## Etc
+background	191A1C
+stdout		BCBEC4
+errout		F75464
+
+green (user)	6AAB73
+
+## Git
+
+
+
+## Reworked Terminal
+
+### Normal
+black		000000
+red		F27481
+green		6BCC62
+yellow		E0CE70
+blue		5594FA
+magenta		C092FA
+cyan		47CCBD
+white		CED0D6
+
+### Bright
+black		4E5157
+red		FF6B7A
+green		67FF59
+yellow		FFEC1A
+blue		3399FF
+magenta		D970FF
+cyan		40FFE9
+white		FFFFFF
+

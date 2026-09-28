@@ -1,0 +1,5 @@
+/* Hide _assets folders from the file explorer */
+div[data-path$="_assets"],
+div[data-path*="_assets/"] {
+  display: none;
+}

@@ -1,0 +1,13 @@
+#############
+### MACOS ###
+#############
+
+# Por alguna razon algunas cosas como git o nvim estaban en español. Con esta linea supuestamente se arregla.
+export LANG=en_US.UTF-8
+
+#THIS MUST BE AT THE END OF THE FILE FOR SDKMAN TO WORK!!!
+export SDKMAN_DIR="$HOME/.sdkman"
+[[ -s "$HOME/.sdkman/bin/sdkman-init.sh" ]] && source "$HOME/.sdkman/bin/sdkman-init.sh"
+
+### end of MACOS ###
+# ===========================================================================

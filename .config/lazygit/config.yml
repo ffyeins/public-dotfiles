@@ -1,0 +1,12 @@
+gui:
+  showFileTree: false
+  splitDiff: 'auto'
+
+  theme:
+    activeBorderColor:
+      - '#8caaee'  # blue
+      - bold
+    inactiveBorderColor:
+      - '#626880'  # subtext0
+    selectedLineBgColor:
+      - '#1c3578'

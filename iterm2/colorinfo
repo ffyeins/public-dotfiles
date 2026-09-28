@@ -1,0 +1,340 @@
+#!/usr/bin/env bash
+# colorinfo — Display terminal color capabilities and palette
+set -euo pipefail
+
+BOLD="\033[1m"
+DIM="\033[2m"
+ITALIC="\033[3m"
+RESET="\033[0m"
+UNDERLINE="\033[4m"
+
+# ── Header ──────────────────────────────────────────────────────────
+print_header() {
+    printf "\n"
+    printf "${BOLD}  ╔══════════════════════════════════════════════════════════════════╗${RESET}\n"
+    printf "${BOLD}  ║                      Terminal Color Info                         ║${RESET}\n"
+    printf "${BOLD}  ╚══════════════════════════════════════════════════════════════════╝${RESET}\n"
+    printf "\n"
+    printf "  ${DIM}Terminal:${RESET}  %s\n" "${TERM:-unknown}"
+    printf "  ${DIM}COLORTERM:${RESET} %s\n" "${COLORTERM:-not set}"
+    printf "  ${DIM}Shell:${RESET}     %s\n" "${SHELL:-unknown}"
+    printf "\n"
+}
+
+# ── Standard 16 Colors (two-column) ─────────────────────────────────
+print_basic_swatches() {
+    local names=("Black" "Red" "Green" "Yellow" "Blue" "Magenta" "Cyan" "White")
+    local rgb=()
+    local osc_ok=false
+
+    # Query terminal for actual palette RGB values via OSC 4
+    local tmpfile="/tmp/colorinfo.$$"
+    if query_osc4_colors "$tmpfile"; then
+        local idx=0
+        while IFS= read -r hex; do
+            rgb[$idx]="$hex"
+            idx=$((idx + 1))
+        done < "$tmpfile"
+        [[ $idx -ge 16 ]] && osc_ok=true
+    fi
+    rm -f "$tmpfile" 2>/dev/null
+
+    printf "  ${BOLD}${UNDERLINE}ANSI Colors (0–15)${RESET}\n\n"
+
+    printf "  ${DIM}     Normal                          Bright${RESET}\n"
+    printf "  ${DIM}     ──────                          ──────${RESET}\n"
+
+    for i in {0..7}; do
+        local n=$((i + 8))
+        local nhex="?" bhex="?"
+        $osc_ok && nhex="#${rgb[$i]}" && bhex="#${rgb[$n]}"
+
+        printf "  %2d " "$i"
+        printf "\033[48;5;${i}m    ${RESET}"
+        printf " %-8s ${DIM}%-8s${RESET}" "${names[$i]}" "$nhex"
+        printf "  "
+        printf "%2d " "$n"
+        printf "\033[48;5;${n}m    ${RESET}"
+        printf " %-8s ${DIM}%-8s${RESET}" "${names[$i]}" "$bhex"
+        printf "\n"
+    done
+
+    if ! $osc_ok; then
+        printf "\n  ${DIM}(Could not query palette — terminal may not support OSC 4)${RESET}\n"
+    fi
+    printf "\n"
+}
+
+# ── Query terminal palette via OSC 4 ───────────────────────────────
+# Writes 16 lines of uppercase hex (e.g. "1A1B1C") to $1.
+# MUST be called from the main shell (not a subshell) so /dev/tty works.
+query_osc4_colors() {
+    local outfile="$1"
+
+    # Check /dev/tty is usable (test in subshell to suppress errors)
+    (echo < /dev/tty) 2>/dev/null || return 1
+
+    # Open /dev/tty on fd 3 (read) and fd 4 (write)
+    exec 3</dev/tty 4>/dev/tty
+
+    # Save and configure terminal
+    local saved
+    saved=$(stty -g <&3 2>/dev/null) || { exec 3<&- 4>&-; return 1; }
+    stty raw -echo min 0 time 5 <&3 2>/dev/null
+
+    # Query all 16 colors, with a DSR as end-of-response sentinel
+    local query=""
+    for i in {0..15}; do query+="\033]4;${i};?\007"; done
+    query+="\033[6n"
+    printf "$query" >&4
+
+    # Slurp all responses
+    local buf=""
+    while IFS= read -r -d '' -t 1 -n 1 char <&3 2>/dev/null; do
+        buf+="$char"
+        [[ "$char" == "R" ]] && break
+    done
+
+    # Restore terminal and close fds
+    stty "$saved" <&3 2>/dev/null
+    exec 3<&- 4>&-
+
+    # Parse rgb:RRRR/GGGG/BBBB (terminals return 4-hex-digit components)
+    local count=0
+    local tmp="$buf"
+    : > "$outfile"
+
+    while [[ "$tmp" =~ rgb:([0-9a-fA-F]+)/([0-9a-fA-F]+)/([0-9a-fA-F]+) ]]; do
+        local r="${BASH_REMATCH[1]}" g="${BASH_REMATCH[2]}" b="${BASH_REMATCH[3]}"
+        printf '%s%s%s\n' "${r:0:2}" "${g:0:2}" "${b:0:2}" \
+            | tr '[:lower:]' '[:upper:]' >> "$outfile"
+        tmp="${tmp#*${BASH_REMATCH[0]}}"
+        count=$((count + 1))
+        [[ $count -ge 16 ]] && break
+    done
+
+    [[ $count -eq 16 ]]
+}
+
+# ── 256 Color Cube ──────────────────────────────────────────────────
+print_256_colors() {
+    printf "  ${BOLD}${UNDERLINE}216-Color Cube (16–231)${RESET}\n\n"
+    for green in {0..5}; do
+        printf "  "
+        for red in {0..5}; do
+            for blue in {0..5}; do
+                local color=$((16 + red * 36 + green * 6 + blue))
+                printf "\033[48;5;${color}m  ${RESET}"
+            done
+            printf " "
+        done
+        printf "\n"
+    done
+    printf "\n"
+}
+
+# ── Grayscale Ramp ──────────────────────────────────────────────────
+print_grayscale() {
+    printf "  ${BOLD}${UNDERLINE}Grayscale Ramp (232–255)${RESET}\n\n"
+    printf "  "
+    for i in {232..255}; do
+        printf "\033[48;5;${i}m  ${RESET}"
+    done
+    printf "\n  ${DIM}"
+    printf "  232"
+    printf "%*s" 38 ""
+    printf "255${RESET}\n\n"
+}
+
+# ── Truecolor Gradients ────────────────────────────────────────────
+print_truecolor() {
+    printf "  ${BOLD}${UNDERLINE}Truecolor Gradients (24-bit)${RESET}\n\n"
+
+    local cols=60
+
+    # Hue wheel
+    printf "  "
+    for ((i = 0; i < cols; i++)); do
+        local hue=$(( i * 360 / cols ))
+        local _r _g _b
+        read _r _g _b <<< "$(hue_to_rgb "$hue")"
+        printf "\033[48;2;${_r};${_g};${_b}m ${RESET}"
+    done
+    printf "  ${DIM}Hue${RESET}\n"
+
+    # Grayscale
+    printf "  "
+    for ((i = 0; i < cols; i++)); do
+        local v=$(( i * 255 / (cols - 1) ))
+        printf "\033[48;2;${v};${v};${v}m ${RESET}"
+    done
+    printf "  ${DIM}Gray${RESET}\n"
+
+    # Cool
+    printf "  "
+    for ((i = 0; i < cols; i++)); do
+        local g=$(( i * 255 / (cols - 1) ))
+        local b=$(( 255 - g ))
+        printf "\033[48;2;0;${g};${b}m ${RESET}"
+    done
+    printf "  ${DIM}Cool${RESET}\n"
+
+    # Warm
+    printf "  "
+    for ((i = 0; i < cols; i++)); do
+        local g=$(( i * 255 / (cols - 1) ))
+        printf "\033[48;2;255;${g};0m ${RESET}"
+    done
+    printf "  ${DIM}Warm${RESET}\n"
+
+    printf "\n"
+    if [[ "${COLORTERM:-}" == "truecolor" || "${COLORTERM:-}" == "24bit" ]]; then
+        printf "  ${BOLD}✓${RESET} Truecolor (24-bit) ${BOLD}supported${RESET}\n"
+    else
+        printf "  ${DIM}? Truecolor support unclear (COLORTERM not set to truecolor/24bit)${RESET}\n"
+    fi
+    printf "\n"
+}
+
+# ── Foreground Preview (all styles per color) ───────────────────────
+print_foreground_preview() {
+    local names=("Black" "Red" "Green" "Yellow" "Blue" "Magenta" "Cyan" "White")
+    local fg_codes=(30 31 32 33 34 35 36 37)
+    local bfg_codes=(90 91 92 93 94 95 96 97)
+
+    printf "  ${BOLD}${UNDERLINE}Foreground Preview${RESET}\n\n"
+
+    # Header row
+    printf "  ${DIM}%-10s  %-10s %-10s %-10s %-10s %-10s %-10s${RESET}\n" \
+        "Color" "Normal" "Bold" "Dim" "Italic" "Underline" "Reverse"
+    printf "  ${DIM}%-10s  %-10s %-10s %-10s %-10s %-10s %-10s${RESET}\n" \
+        "──────" "──────" "──────" "──────" "──────" "──────" "───────"
+
+    # Normal colors
+    for i in {0..7}; do
+        local c=${fg_codes[$i]}
+        printf "  \033[${c}m%-10s${RESET}" "${names[$i]}"
+        printf "  \033[${c}m%-10s${RESET}" "sample"
+        printf " \033[1;${c}m%-10s${RESET}" "sample"
+        printf " \033[2;${c}m%-10s${RESET}" "sample"
+        printf " \033[3;${c}m%-10s${RESET}" "sample"
+        printf " \033[4;${c}m%-10s${RESET}" "sample"
+        printf " \033[7;${c}m%-10s${RESET}" "sample"
+        printf "\n"
+    done
+
+    printf "\n"
+
+    # Bright colors
+    printf "  ${DIM}%-10s  %-10s %-10s %-10s %-10s %-10s %-10s${RESET}\n" \
+        "Bright" "Normal" "Bold" "Dim" "Italic" "Underline" "Reverse"
+    printf "  ${DIM}%-10s  %-10s %-10s %-10s %-10s %-10s %-10s${RESET}\n" \
+        "──────" "──────" "──────" "──────" "──────" "──────" "───────"
+
+    for i in {0..7}; do
+        local c=${bfg_codes[$i]}
+        printf "  \033[${c}m%-10s${RESET}" "${names[$i]}"
+        printf "  \033[${c}m%-10s${RESET}" "sample"
+        printf " \033[1;${c}m%-10s${RESET}" "sample"
+        printf " \033[2;${c}m%-10s${RESET}" "sample"
+        printf " \033[3;${c}m%-10s${RESET}" "sample"
+        printf " \033[4;${c}m%-10s${RESET}" "sample"
+        printf " \033[7;${c}m%-10s${RESET}" "sample"
+        printf "\n"
+    done
+    printf "\n"
+}
+
+# ── Background Combinations ─────────────────────────────────────────
+print_background_combos() {
+    local names=("Black" "Red" "Green" "Yellow" "Blue" "Magenta" "Cyan" "White")
+    local bg_codes=(40 41 42 43 44 45 46 47)
+
+    printf "  ${BOLD}${UNDERLINE}Background + Foreground Combinations${RESET}\n\n"
+
+    # Header
+    printf "  ${DIM}%-8s${RESET}" "bg \\ fg"
+    for i in {0..7}; do
+        printf "  ${DIM}%-5s${RESET}" "${names[$i]:0:3}"
+    done
+    printf "\n"
+
+    # Each background with all foregrounds
+    for bg in {0..7}; do
+        printf "  %-8s" "${names[$bg]:0:7}"
+        for fg in {0..7}; do
+            printf "  \033[${bg_codes[$bg]};3${fg}m %-3s ${RESET}" "Abc"
+        done
+        printf "\n"
+    done
+
+    printf "\n"
+
+    # Bright backgrounds
+    printf "  ${DIM}%-8s${RESET}" "bg \\ fg"
+    for i in {0..7}; do
+        printf "  ${DIM}%-5s${RESET}" "${names[$i]:0:3}"
+    done
+    printf "\n"
+
+    for bg in {0..7}; do
+        printf "  %-8s" "B.${names[$bg]:0:5}"
+        for fg in {0..7}; do
+            printf "  \033[10${bg};9${fg}m %-3s ${RESET}" "Abc"
+        done
+        printf "\n"
+    done
+    printf "\n"
+}
+
+# ── Text Attributes ─────────────────────────────────────────────────
+print_attributes() {
+    printf "  ${BOLD}${UNDERLINE}Text Attributes${RESET}\n\n"
+
+    printf "  \033[0mNormal${RESET}        \033[1mBold${RESET}          \033[2mDim${RESET}           \033[3mItalic${RESET}\n"
+    printf "  \033[4mUnderline${RESET}     \033[5mBlink${RESET}         \033[7mReverse${RESET}       \033[9mStrikethrough${RESET}\n"
+    printf "\n"
+
+    # Combined attributes
+    printf "  ${DIM}Combined:${RESET}\n"
+    printf "  \033[1;3mBold+Italic${RESET}   \033[1;4mBold+Uline${RESET}    \033[2;3mDim+Italic${RESET}    \033[3;4mItalic+Uline${RESET}\n"
+    printf "  \033[1;9mBold+Strike${RESET}   \033[4;9mUline+Strike${RESET}  \033[1;3;4mBld+It+Ul${RESET}     \033[2;4;9mDim+Ul+Str${RESET}\n"
+    printf "\n"
+
+    # Attributes + color examples
+    printf "  ${DIM}With color:${RESET}\n"
+    printf "  \033[1;31mBold Red${RESET}      \033[3;32mItalic Green${RESET}  \033[4;34mUline Blue${RESET}    \033[1;3;33mBold+It Yel${RESET}\n"
+    printf "  \033[2;35mDim Magenta${RESET}   \033[9;36mStrike Cyan${RESET}   \033[1;4;91mBld+Ul BRed${RESET}  \033[3;4;96mIt+Ul BCyan${RESET}\n"
+    printf "\n"
+}
+
+# ── Helper: HSV hue (0–360) → RGB, prints "R G B" ──────────────────
+hue_to_rgb() {
+    local hue=$1
+    local sector=$(( hue / 60 ))
+    local frac=$(( (hue % 60) * 255 / 60 ))
+    local inv=$(( 255 - frac ))
+
+    case $sector in
+        0) echo "255 $frac 0"   ;;
+        1) echo "$inv 255 0"    ;;
+        2) echo "0 255 $frac"   ;;
+        3) echo "0 $inv 255"    ;;
+        4) echo "$frac 0 255"   ;;
+        *) echo "255 0 $inv"    ;;
+    esac
+}
+
+# ── Main ────────────────────────────────────────────────────────────
+main() {
+    print_header
+    print_basic_swatches
+    print_256_colors
+    print_grayscale
+    print_truecolor
+    print_foreground_preview
+    print_background_combos
+    print_attributes
+}
+
+main "$@"
