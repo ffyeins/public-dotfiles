@@ -1,0 +1,55 @@
+# Machine-local shell overrides and secrets
+.zshenv.local
+
+# Neovim
+.config/nvim/lazy-lock.json
+
+# Sensitive docs
+docs/sensitive/
+
+# Obsidian
+.obsidian/appearance.json
+
+# Delete lines above. They are for dotfiles/.
+
+# macOS
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+.AppleDouble
+.LSOverride
+Icon?
+
+# Linux
+*~
+.fuse_hidden*
+.directory
+.Trash-*
+.nfs*
+
+# IDE - VSCode
+.vscode/
+.history/
+*.vsix
+
+# IDE - Jetbrains (IntelliJ, Android Studio, etc.)
+.idea/
+*.iml
+*.iws
+*.ipr
+.idea_modules/
+
+# Editors - vim/emacs
+*.swp
+*.swo
+*.swn
+Session.vim
+.netrwhist
+.#*
+
+# Env / secrets
+.env
+.env.local
+.env.*.local
