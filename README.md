@@ -7,7 +7,7 @@ Add file/directory to the list in `file-list.txt`.
 Then, run:
 
 ```bash
-rsync -arL --files-from=/Users/fran/dev/dotfiles-public/file-list.txt ~/dotfiles/ ~/dev/dotfiles-public/
+rsync -arL --files-from=/Users/fran/dev/public-dotfiles/file-list.txt ~/dotfiles/ ~/dev/public-dotfiles/
 ```
 
 ## Symlinks
