@@ -1,5 +1,5 @@
 [user]
-	email = 86212224+ffyeins@users.noreply.github.com
+	email = 86212234+ffyeins@users.noreply.github.com
 	name = fran
 
 [init]
@@ -40,10 +40,15 @@
 	syntax-theme = Visual Studio Dark+
 
 	# changed lines: muted tint + syntax colors on top
-	minus-style                   = syntax "#3a1e22"
-	minus-emph-style              = syntax "#7d2e33"
-	plus-style                    = syntax "#162a1e"
-	plus-emph-style               = syntax "#2e6b40"
+	# red/green pairs share lightness so neither side looks louder
+	minus-style                   = syntax "#391f20"
+	minus-emph-style              = syntax "#703133"
+	plus-style                    = syntax "#182d1e"
+	plus-emph-style               = syntax "#1b552c"
+
+	# moved lines (diff.colorMoved): git marks them bold magenta/cyan, and bold blue/yellow
+	# for the next block in zebra mode; show them as purple (moved from) and teal (moved to)
+	map-styles                    = bold purple => syntax "#302134", bold blue => syntax "#3f2f42", bold cyan => syntax "#092d2f", bold yellow => syntax "#193c3d"
 
 	# gutter
 	line-numbers-minus-style      = "#e06c75"
@@ -62,8 +67,11 @@
 	file-style                    = bold "#d4d4d4"
 	file-decoration-style         = "#3e4451" ul
 
-	# don't wrap long lines onto a new row
+	# don't wrap long lines onto a new row: wrap-max-lines covers side-by-side view,
+	# --chop-long-lines covers the normal view (scroll sideways with ←/→).
+	# The other two flags are delta's defaults for less, which a custom pager replaces.
 	wrap-max-lines = 0
+	pager          = less --RAW-CONTROL-CHARS --quit-if-one-screen --chop-long-lines
 
 [push]
 	# no more "git push -u origin <branch>" on first push
