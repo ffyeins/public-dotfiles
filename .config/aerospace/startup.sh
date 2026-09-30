@@ -80,6 +80,8 @@ ensure_window() {
     if [ -n "$existing" ]; then
         log "$app_name: already running, using window $(echo "$existing" | head -1)"
         echo "$existing" | head -1 > "$outfile"
+        # Tells iterm_run not to type into it: it may already be running something.
+        touch "$outfile.reused"
         return 0
     fi
 
@@ -134,6 +136,29 @@ try_move() {
     fi
 }
 
+# Type a command into a new iTerm window's shell, as if typed by hand.
+# Skips reused windows: they may be running something (tmux, nvim) already.
+# Usage: iterm_run <name> <command>
+iterm_run() {
+    local name="$1" cmd="$2"
+
+    [ -f "$tmpdir/$name" ] || return    # no window; try_move already reported it
+    if [ -f "$tmpdir/$name.reused" ]; then
+        log "$name: window was already open, not running '$cmd'"
+        return
+    fi
+
+    local window_id
+    window_id=$(cat "$tmpdir/$name")
+    log "$name: running '$cmd' in window $window_id"
+    if ! osascript \
+        -e 'on run argv' \
+        -e 'tell application "iTerm" to tell current session of window id (item 1 of argv as integer) to write text (item 2 of argv)' \
+        -e 'end run' "$window_id" "$cmd"; then
+        fail "$name failed to start tmux"
+    fi
+}
+
 # Ensure app windows exist (parallel — reuse existing or launch + wait)
 ensure_window "com.googlecode.iterm2" "iTerm"   "$tmpdir/iterm"   &
 ensure_window "org.mozilla.firefox"   "Firefox" "$tmpdir/firefox" &
@@ -143,6 +168,8 @@ wait
 try_move iterm   T h_tiles
 try_move firefox W h_tiles
 
+iterm_run iterm "$HOME/dotfiles/scripts/tmux_start.sh main"
+
 # iTerm second window — needs first window moved before snapshotting
 before_iterm_second=$(get_window_ids "com.googlecode.iterm2")
 log "iTerm: opening second window"
@@ -151,6 +178,7 @@ if ! osascript -e 'tell application "iTerm" to create window with default profil
 fi
 wait_for_window "com.googlecode.iterm2" "$before_iterm_second" "$tmpdir/iterm2"
 try_move iterm2 Y h_tiles
+iterm_run iterm2 "$HOME/dotfiles/scripts/tmux_start.sh secondary"
 
 # Firefox second window — needs first window moved before snapshotting
 before_firefox_second=$(get_window_ids "org.mozilla.firefox")
