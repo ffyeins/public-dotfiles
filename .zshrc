@@ -64,6 +64,8 @@ alias lg='lazygit'
 
 alias traffic-report='~/dotfiles/scripts/commute-report'
 
+alias tq='ask tmux' # quick tmux questions: ~/dev/helper-agent
+
 ### end of SCRIPTS ###
 # ===========================================================================
 

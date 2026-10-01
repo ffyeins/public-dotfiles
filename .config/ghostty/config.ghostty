@@ -1,0 +1,24 @@
+font-size = 14
+
+# Colors copied from the iTerm2 "JetBrains Mono Nerd Font" profile
+background = #191a1c
+
+# ANSI colors 0-15
+# Normal
+palette = 0=#000000
+palette = 1=#f27481
+palette = 2=#6aab73
+palette = 3=#e0ce70
+palette = 4=#5594fa
+palette = 5=#c092fa
+palette = 6=#47ccbd
+palette = 7=#ced0d6
+# Bright
+palette = 8=#4e5157
+palette = 9=#ff6b7a
+palette = 10=#67ff59
+palette = 11=#ffec1a
+palette = 12=#3399ff
+palette = 13=#d970ff
+palette = 14=#40ffe9
+palette = 15=#ffffff
