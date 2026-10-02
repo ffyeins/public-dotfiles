@@ -6,3 +6,9 @@ set -eu
 repo=$(cd "$(dirname "$0")" && pwd)
 
 rsync -arL --files-from="$repo/file-list.txt" "$@" "$HOME/dotfiles/" "$repo/"
+
+git add .
+
+git cm "update"
+
+git st
