@@ -57,8 +57,8 @@ export BAT_PAGING=never # Removes pagination for bat command
 export BAT_STYLE=plain
 alias batf='bat --paging=always --style=full'  # "bat full"
 
-alias ls='eza --classify=auto' # appends type indicators to filenames; a bare -F would eat the next argument
-alias lst='eza -F -a -T -L 3'
+alias ls='eza --classify=auto --group-directories-first' # appends type indicators to filenames; a bare -F would eat the next argument
+alias lst='eza --classify=auto -a --group-directories-first --git-ignore -T -L 3'
 
 alias lg='lazygit'
 
