@@ -1,0 +1,65 @@
+{
+  "attribution": {
+    "commit": "",
+    "pr": "",
+    "sessionUrl": false
+  },
+  "includeGitInstructions": false,
+  "permissions": {
+    "allow": [
+      "Bash(chmod +x *)",
+      "Bash(command -v *)",
+      "Bash(jq *)",
+      "Bash(shellcheck *)",
+      "Bash(git mv *)",
+      "Bash(bash:*)",
+      "Bash(python3:*)",
+      "Read(//Users/fran/dev/claude-skills/doc-lookup/skills/doc-lookup/docs/**)",
+      "Read(//Users/fran/dev/claude-skills/doc-lookup/skills/doc-lookup/devdocs/**)"
+    ],
+    "ask": [
+      "Bash(sudo *)"
+    ],
+    "defaultMode": "auto",
+    "disableBypassPermissionsMode": "disable"
+  },
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash|EnterWorktree|Agent",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"$HOME/.claude/hooks/git-guard.sh\""
+          }
+        ]
+      }
+    ]
+  },
+  "worktree": {
+    "baseRef": "fresh",
+    "bgIsolation": "none"
+  },
+  "workflowKeywordTriggerEnabled": false,
+  "enabledPlugins": {
+    "gopls-lsp@claude-plugins-official": true,
+    "jdtls-lsp@claude-plugins-official": false,
+    "pyright-lsp@claude-plugins-official": false,
+    "kotlin-lsp@claude-plugins-official": false,
+    "lua-lsp@claude-plugins-official": false
+  },
+  "effortLevel": "xhigh",
+  "modelSettings": {
+    "claude-opus-5": {
+      "effortLevel": "high"
+    },
+    "claude-opus-5-5": {
+      "effortLevel": "xhigh"
+    }
+  },
+  "promptSuggestionEnabled": false,
+  "askUserQuestionTimeout": "never",
+  "tui": "fullscreen",
+  "autoCompactEnabled": true,
+  "agentPushNotifEnabled": true
+}

@@ -5,8 +5,11 @@
 .zshenv
 .zshrc
 .zshrc.macos
+ai/
 docs/
+gitfiles/
 fonts/
 iterm2/
 scripts/run_caffeinate.sh
 scripts/tmux_copy_last_output.sh
+scripts/tmux_start.sh

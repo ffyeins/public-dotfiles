@@ -7,8 +7,11 @@ Add file/directory to the list in `file-list.txt`.
 Then, run:
 
 ```bash
-rsync -arL --files-from=/Users/fran/dev/public-dotfiles/file-list.txt ~/dotfiles/ ~/dev/public-dotfiles/
+./sync.sh
 ```
+
+It runs `rsync -arL --files-from=file-list.txt ~/dotfiles/ <this repo>/`.
+Extra arguments go to rsync, so `./sync.sh -nv` is a dry run.
 
 ## Symlinks
 
@@ -31,6 +34,13 @@ ln -sf "$DOTFILES/.config/borders" ~/.config/borders
 ln -sf "$DOTFILES/.config/aerospace" ~/.config/aerospace
 # Work machine: use this instead of the aerospace line above
 # ln -sf "$DOTFILES/.config/aerospace-work" ~/.config/aerospace
+
+# Claude Code: CLAUDE.md (imports ai/AGENTS.md), settings and the git-guard hook
+# (the hook needs jq; ln -sf replaces existing files, so back them up first)
+mkdir -p ~/.claude/hooks
+ln -sf "$DOTFILES/ai/claude/CLAUDE.md" ~/.claude/CLAUDE.md
+ln -sf "$DOTFILES/ai/claude/settings.json" ~/.claude/settings.json
+ln -sf "$DOTFILES/ai/claude/hooks/git-guard.sh" ~/.claude/hooks/git-guard.sh
 
 # Obsidian (repeat for each vault)
 VAULT=~/your-vault
