@@ -5,10 +5,14 @@ set -eu
 
 repo=$(cd "$(dirname "$0")" && pwd)
 
+printf 'Syncing with dotfiles...'
 rsync -arL --files-from="$repo/file-list.txt" "$@" "$HOME/dotfiles/" "$repo/"
+printf 'OK\n\n'
 
+printf 'Commiting changes...'
 git add .
-
 git cm "update"
+printf 'OK\n\n'
 
+printf 'Git status:\n'
 git st
