@@ -14,14 +14,15 @@
 	diffFilter = delta --color-only
 
 [merge]
-    tool = nvimdiff
+	tool = nvimdiff
 	# show common ancestor in conflict markers, not just both sides
 	conflictStyle = zdiff3
-[mergetool "nvimdiff"]
-    cmd = nvim -d $LOCAL $REMOTE $MERGED -c '$wincmd w' -c 'wincmd J'
 [mergetool]
-    prompt = false
+	prompt = false
 	keepBackup = false
+[mergetool "nvimdiff"]
+	# git's built-in nvimdiff: LOCAL and REMOTE side by side, MERGED below
+	layout = LOCAL,REMOTE/MERGED
 
 [diff]
 	tool = nvimdiff
@@ -37,14 +38,16 @@
 [delta]
 	navigate = true
 	line-numbers = true
-	syntax-theme = Visual Studio Dark+
+	syntax-theme = GitHub Dark Default
 
 	# changed lines: muted tint + syntax colors on top
-	# red/green pairs share lightness so neither side looks louder
-	minus-style                   = syntax "#391f20"
-	minus-emph-style              = syntax "#703133"
-	plus-style                    = syntax "#182d1e"
-	plus-emph-style               = syntax "#1b552c"
+	# GitHub's red #f85149 and green #2ea043, pre-blended because delta drops the alpha in #rrggbbaa:
+	# line bg is ~25% red / ~32% green over the ghostty background #191a1c,
+	# word highlight is ~45% of the same color over the line bg
+	minus-style                   = syntax "#512827"
+	minus-emph-style              = syntax "#9c3a36"
+	plus-style                    = syntax "#204528"
+	plus-emph-style               = syntax "#266e34"
 
 	# moved lines (diff.colorMoved): git marks them bold magenta/cyan, and bold blue/yellow
 	# for the next block in zebra mode; show them as purple (moved from) and teal (moved to)
@@ -84,6 +87,10 @@
 [fetch]
 	# fetch every remote, not just origin
 	all = true
+	# delete local refs to branches deleted on the remote
+	prune = true
+	# also delete local tags that aren't on the remote, unpushed ones included
+	pruneTags = true
 
 [rebase]
 	# stash dirty worktree before rebase, pop after
@@ -118,7 +125,9 @@
 	sort = version:refname
 
 [branch]
+	# list most recently committed branches first
 	sort = -committerdate
+
 [alias]
 	st = status
 	co = checkout
