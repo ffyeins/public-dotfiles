@@ -1,5 +1,7 @@
 #!/bin/sh
 
-tmux kill-session -t caffeinate 2>/dev/null
-tmux new-session -d -s caffeinate -n caffeinate
-tmux send-keys -t caffeinate:caffeinate 'caffeinate -d' C-m
+session="z_caffeinate"
+
+tmux kill-session -t "$session" 2>/dev/null
+tmux new-session -d -s "$session" -n caffeinate
+tmux send-keys -t "$session:caffeinate" 'caffeinate -d' C-m

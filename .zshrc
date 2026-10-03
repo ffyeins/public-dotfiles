@@ -51,7 +51,7 @@ alias mdprint="$SCRIPTS_DIR/mdprint.sh"
 export PATH="$HOME/dev/mdread:$PATH"
 
 alias runcaffeinate="$SCRIPTS_DIR/run_caffeinate.sh"
-alias killcaffeinate='tmux kill-session -t caffeinate_session 2>/dev/null'
+alias killcaffeinate='tmux kill-session -t z_caffeinate 2>/dev/null'
 
 export BAT_PAGING=never # Removes pagination for bat command
 export BAT_STYLE=plain
