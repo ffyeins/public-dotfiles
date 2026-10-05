@@ -10,6 +10,7 @@ docs/
 gitfiles/
 fonts/
 iterm2/
+scripts/mdprint.sh
 scripts/run_caffeinate.sh
 scripts/tmux_copy_last_output.sh
 scripts/tmux_fuzzy_switch.sh
