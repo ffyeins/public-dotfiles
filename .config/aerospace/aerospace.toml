@@ -9,7 +9,8 @@ enable-normalization-flatten-containers = true
 enable-normalization-opposite-orientation-for-nested-containers = true
 
 # Run startup script to open apps on their designated workspaces.
-# The script handles all window placement — no on-window-detected rules needed.
+# The script handles workspace placement; on-window-detected rules below
+# only make some apps float.
 after-startup-command = [
     'exec-and-forget ~/.config/aerospace/startup.sh'
 ]
@@ -55,6 +56,40 @@ Y = 'secondary'
 3 = 'secondary'
 4 = 'secondary'
 5 = 'secondary'
+
+# ──────────────────────────────────────────────
+# Floating apps
+# ──────────────────────────────────────────────
+# New windows of these apps float instead of tiling. Conditions in one
+# block are ANDed, so each app needs its own block.
+# Find an app's ID with `aerospace list-apps`.
+[[on-window-detected]]
+if.app-id = 'com.apple.finder'
+run = 'layout floating'
+
+[[on-window-detected]]
+if.app-id = 'com.apple.systempreferences'     # System Settings
+run = 'layout floating'
+
+[[on-window-detected]]
+if.app-id = 'com.apple.ActivityMonitor'
+run = 'layout floating'
+
+[[on-window-detected]]
+if.app-id = 'com.apple.calculator'
+run = 'layout floating'
+
+[[on-window-detected]]
+if.app-id = 'com.apple.DiskUtility'
+run = 'layout floating'
+
+[[on-window-detected]]
+if.app-id = 'com.apple.SystemProfiler'        # System Information
+run = 'layout floating'
+
+[[on-window-detected]]
+if.app-id = 'com.apple.archiveutility'
+run = 'layout floating'
 
 # ──────────────────────────────────────────────
 # Main keybindings
