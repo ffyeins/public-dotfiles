@@ -1,5 +1,12 @@
 # Command Line
 
+## Search files by name
+
+```bash
+find ~ -maxdepth 3 -type f -name 'XXXX' 2>/dev/null
+find ~ -maxdepth 3 -type d -name 'XXXX' 2>/dev/null
+```
+
 ## Fix missing cursor on terminal
 
 When missing, dissapeared, hidden cursor, then run:
@@ -22,20 +29,6 @@ ncdu /  # scan root
 
 ```bash
 tar -czf filename.tar.gz *.txt
-```
-
-## Tree
-
-```bash
-ls -T -L 4
-```
-
-```bash
-tree -L 2 -F
-```
-
-```bash
-tree -hF -L 4 /mnt/storage
 ```
 
 ## `scp`: transfer files

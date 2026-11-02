@@ -78,6 +78,23 @@ function y() {
 	command rm -f -- "$tmp"
 }
 
+# Turn off mouse/focus reporting that a TUI left on when it died without
+# cleaning up (crash, kill -9, dropped SSH). Otherwise mouse moves dump
+# reports like 35;73;30M at the prompt. Inside tmux, the pane's mode can be
+# read first, so log the command that leaked it to find the culprit.
+_mouse_leak_preexec() {
+    _mouse_leak_cmd=$1
+}
+_reset_mouse_modes() {
+    if [[ -n $TMUX && $(tmux display -p -t "$TMUX_PANE" '#{mouse_any_flag}') == 1 ]]; then
+        print -r -- "$(date '+%F %T') $_mouse_leak_cmd" >> ~/.cache/mouse-leak.log
+    fi
+    print -n '\e[?1000l\e[?1002l\e[?1003l\e[?1004l\e[?1005l\e[?1006l\e[?1015l'
+}
+autoload -Uz add-zsh-hook
+add-zsh-hook preexec _mouse_leak_preexec
+add-zsh-hook precmd _reset_mouse_modes
+
 # Load OS-specific configuration
 if [[ "$(uname)" == "Linux" ]]; then
     [[ -f ~/dotfiles/.zshrc.linux ]] && source ~/dotfiles/.zshrc.linux
