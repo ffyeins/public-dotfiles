@@ -13,6 +13,7 @@ iterm2/
 scripts/mdprint.sh
 scripts/mdprint-macos-arm
 scripts/mdprint-linux
+scripts/mdread/
 scripts/run_caffeinate.sh
 scripts/tmux_copy_last_output.sh
 scripts/tmux_fuzzy_switch.sh
