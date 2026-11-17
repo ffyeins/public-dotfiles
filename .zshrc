@@ -47,8 +47,8 @@ SCRIPTS_DIR=~/dotfiles/scripts
 
 alias cheat="$SCRIPTS_DIR/fuzzy-cheatsheet/fuzzy_cheatsheet.sh"
 alias mdprint="$SCRIPTS_DIR/mdprint.sh"
-# alias md2html="$SCRIPTS_DIR/mdread/md2html/md2html.py" # DEPRECATED
-export PATH="$HOME/dev/mdread:$PATH"
+alias mdread="$SCRIPTS_DIR/mdread/mdread"
+alias mdtohtml="$SCRIPTS_DIR/mdread/mdtohtml"
 
 alias runcaffeinate="$SCRIPTS_DIR/run_caffeinate.sh"
 alias killcaffeinate='tmux kill-session -t z_caffeinate 2>/dev/null'

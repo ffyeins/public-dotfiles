@@ -91,6 +91,13 @@ run = 'layout floating'
 if.app-id = 'com.apple.archiveutility'
 run = 'layout floating'
 
+# Bitwarden extension popped out of Firefox. The title condition keeps
+# normal Firefox windows tiled.
+[[on-window-detected]]
+if.app-id = 'org.mozilla.firefox'
+if.window-title-regex-substring = '^Extension: \(Bitwarden'
+run = 'layout floating'
+
 # ──────────────────────────────────────────────
 # Main keybindings
 # ──────────────────────────────────────────────

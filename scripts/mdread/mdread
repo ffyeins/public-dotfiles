@@ -1,0 +1,91 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+VERSION="5.0.0"
+prog=mdread
+
+usage() {
+  cat <<'EOF'
+Usage: mdread [--light|--dark] [--] <file.md> [file2.md ...]
+
+Render markdown files to GitHub-style HTML and open them in the browser.
+Markdown is rendered locally with comrak; styling, syntax highlighting, math and
+diagrams load from CDNs when available.
+
+Options:
+  --light        Render with the GitHub light theme
+  --dark         Render with the GitHub dark theme (default)
+  -h, --help     Show this help
+  -v, --version  Show the version
+  --             Treat every following argument as a file
+
+Install the dependency with: brew install comrak
+EOF
+}
+
+here=$(dirname "$(readlink -f "${BASH_SOURCE[0]}" 2>/dev/null || printf '%s' "${BASH_SOURCE[0]}")")
+# shellcheck source=lib/render.sh
+source "$here/lib/render.sh" || { echo "$prog: cannot load $here/lib/render.sh" >&2; exit 1; }
+
+mdr_parse_args 0 "$@"
+case $action in
+  help) usage; exit 0 ;;
+  version) echo "$prog $VERSION"; exit 0 ;;
+esac
+[[ ${#files[@]} -gt 0 ]] || { usage >&2; exit 2; }
+mdr_require_deps
+
+# Pages live in the per-user temp dir. Instead of deleting them seconds after opening (which
+# breaks reloading), each run sweeps pages older than a day.
+tmpdir=${TMPDIR:-/tmp}
+tmpdir=${tmpdir%/}
+find "$tmpdir" -maxdepth 1 -name 'mdread.*.html' -type f -mtime +0 -delete 2>/dev/null || true
+
+# Pages created so far are removed if we exit before handing them to the browser
+pages=()
+ready=()
+# shellcheck disable=SC2329  # called by the EXIT trap
+cleanup() { if [[ ${#pages[@]} -gt 0 ]]; then rm -f "${pages[@]}"; fi; }
+trap cleanup EXIT
+
+failed=0
+for file in "${files[@]}"; do
+  # Keep dash-leading names from being read as options further down
+  [[ $file == -* ]] && file="./$file"
+
+  if [[ ! -f $file || ! -r $file ]]; then
+    echo "$prog: cannot read '$file', skipping" >&2
+    failed=1
+    continue
+  fi
+
+  # macOS mktemp only replaces trailing Xs, so we create then rename to add .html
+  tmp=$(mktemp "$tmpdir/mdread.XXXXXX")
+  page="$tmp.html"
+  mv "$tmp" "$page"
+  pages+=("$page")
+
+  # The page lives in the temp dir, so point <base> at the markdown file's directory for
+  # relative images and links
+  dir=$(CDPATH='' cd -- "$(dirname -- "$file")" && pwd -P)
+  if mdr_render_html "$file" "$theme" "$(mdr_dir_url "$dir")" > "$page"; then
+    ready+=("$page")
+  else
+    echo "$prog: failed to render '$file'" >&2
+    rm -f "$page"
+    failed=1
+  fi
+done
+
+if [[ ${#ready[@]} -eq 0 ]]; then
+  echo "$prog: no files were rendered" >&2
+  exit 1
+fi
+
+for page in "${ready[@]}"; do
+  open "$page"
+done
+
+# The browser has the pages now; the next run's sweep removes them
+trap - EXIT
+exit "$failed"
