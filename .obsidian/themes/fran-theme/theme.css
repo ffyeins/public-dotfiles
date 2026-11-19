@@ -808,14 +808,13 @@ body {
   padding: 16px;
   overflow-x: auto;
   white-space: var(--code-white-space);
-  container-type: scroll-state;
 }
 
 /* A block that scrolls sideways fades out at each edge it has more to
-   scroll to, as in mdread. The fades belong to the <code>, so they can
-   query its scroll state, but are positioned in the <pre>, so they stay
-   put as the text scrolls. They span the text lines only, off the rounded
-   corners and the scrollbar. */
+   scroll to (see Edge fades below). The fades belong to the <code>, so
+   they inherit the variables it sets, but are positioned in the <pre>, so
+   they stay put as the text scrolls. They span the text lines only, off
+   the rounded corners and the scrollbar. */
 .markdown-rendered pre > code::before,
 .markdown-rendered pre > code::after {
   content: "";
@@ -824,30 +823,19 @@ body {
   bottom: 16px;
   width: 16px;
   pointer-events: none;
-  opacity: 0;
   transition: opacity 0.15s;
 }
 
 .markdown-rendered pre > code::before {
   left: 0;
   background: linear-gradient(to right, var(--code-background), transparent);
+  opacity: var(--fran-more-left);
 }
 
 .markdown-rendered pre > code::after {
   right: 0;
   background: linear-gradient(to left, var(--code-background), transparent);
-}
-
-@container scroll-state(scrollable: left) {
-  .markdown-rendered pre > code::before {
-    opacity: 1;
-  }
-}
-
-@container scroll-state(scrollable: right) {
-  .markdown-rendered pre > code::after {
-    opacity: 1;
-  }
+  opacity: var(--fran-more-right);
 }
 
 /* Code blocks in the editor follow the same option */
@@ -944,45 +932,60 @@ body {
 }
 
 /* A table that scrolls sideways fades into the page at each edge it has
-   more to scroll to, as in mdread. Its rows are striped, not one color, so
-   a mask fades it rather than a gradient on top (only the mask's alpha
-   counts, hence #000). The mask goes on the box that scrolls, the
-   .el-table Obsidian wraps it in, and a box can't query its own scroll
-   state. A scroll-driven animation sets the fades' widths instead: the
-   left one is 16px from 1px into the scroll range, the right one until
-   1px before its end. A table that fits has no scroll range, so neither
-   animation runs and both stay 0. */
-@property --fran-fade-left {
-  syntax: "<length>";
-  inherits: false;
-  initial-value: 0px;
-}
-
-@property --fran-fade-right {
-  syntax: "<length>";
-  inherits: false;
-  initial-value: 0px;
-}
-
-@keyframes fran-fade-left {
-  to {
-    --fran-fade-left: 16px;
-  }
-}
-
-@keyframes fran-fade-right {
-  from {
-    --fran-fade-right: 16px;
-  }
-}
-
+   more to scroll to (see Edge fades below). Its rows are striped, not one
+   color, so a mask fades it rather than a gradient on top (only the mask's
+   alpha counts, hence #000). The mask goes on the box that scrolls, the
+   .el-table Obsidian wraps it in. */
 .markdown-rendered .el-table {
-  mask-image: linear-gradient(to right, transparent, #000 var(--fran-fade-left),
-    #000 calc(100% - var(--fran-fade-right)), transparent);
+  mask-image: linear-gradient(to right,
+    transparent, #000 calc(var(--fran-more-left) * 16px),
+    #000 calc(100% - var(--fran-more-right) * 16px), transparent);
+}
+
+/* --- Edge fades ---------------------------------------------------------- */
+
+/* Code blocks and tables fade out at each edge they have more to scroll
+   to, as in mdread. --fran-more-left and --fran-more-right are 1 while the
+   box that scrolls has more to scroll to that side, else 0. A
+   scroll-driven animation on the box's own scroll range sets them: a
+   table's box can't query its own scroll state, and a scroll-state query
+   allows no slack at the end. The left one turns on over the range's
+   first pixel. The right one turns off over its second-to-last, so it's 0
+   within 1px of the end, as in mdread's script: when the box's width isn't
+   a whole number of pixels, Chromium can stop a scroll half a pixel short
+   of the end of its range. A box that fits has no range, so neither
+   animation runs and both stay 0. They're registered so they can animate,
+   and inherited so the code block's fades, its pseudo-elements, see
+   them. */
+@property --fran-more-left {
+  syntax: "<number>";
+  inherits: true;
+  initial-value: 0;
+}
+
+@property --fran-more-right {
+  syntax: "<number>";
+  inherits: true;
+  initial-value: 0;
+}
+
+@keyframes fran-more-left {
+  to {
+    --fran-more-left: 1;
+  }
+}
+
+@keyframes fran-more-right {
+  from {
+    --fran-more-right: 1;
+  }
+}
+
+.markdown-rendered :is(pre > code, .el-table) {
   /* The shorthand resets the timeline and range, so it comes first */
-  animation: fran-fade-left linear both, fran-fade-right linear both;
+  animation: fran-more-left linear both, fran-more-right linear both;
   animation-timeline: scroll(self x);
-  animation-range: 0 1px, calc(100% - 1px) 100%;
+  animation-range: 0 1px, calc(100% - 2px) calc(100% - 1px);
 }
 
 /* ==========================================================================

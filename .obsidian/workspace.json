@@ -13,12 +13,12 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "mermaid.md",
+                "file": "test.md",
                 "mode": "preview",
                 "source": true
               },
               "icon": "lucide-file",
-              "title": "mermaid"
+              "title": "test"
             }
           }
         ]
@@ -204,8 +204,9 @@
   },
   "active": "d9d84fe1c63558f3",
   "lastOpenFiles": [
-    "test.md",
     "mermaid.md",
+    "test.md",
+    "fran-fade-test.md",
     "README.md",
     "fran-probe-overflow.md",
     "fran-code-blocks-test.md",
