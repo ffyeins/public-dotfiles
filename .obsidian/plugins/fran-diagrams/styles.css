@@ -1,0 +1,327 @@
+/* fran-diagrams: mdread's diagram box, buttons and expanded view (lib/render.sh).
+   Colors come from fran-theme's --fran-* variables when it's the active theme, and from
+   Obsidian's own variables otherwise. The options are the plugin's own, below. */
+
+/* @settings
+
+name: Fran Diagrams
+id: fran-diagrams
+settings:
+
+  - id: fran-diagram-padding
+    title: Padding
+    description: Space between a diagram and the edge of its box.
+    type: variable-number-slider
+    default: 16
+    min: 0
+    max: 48
+    step: 4
+    format: px
+
+  - id: fran-diagram-max-height
+    title: Height limit
+    description: Taller diagrams are scaled down to it, proportions kept. A length such as 80vh or 600px, or none for no limit (0 would hide them). Expand shows them at full size.
+    type: variable-text
+    default: 80vh
+
+*/
+
+/* Options. Style Settings (the block above) and CSS snippets override them. */
+body {
+  /* Space between a diagram and the edge of its box */
+  --fran-diagram-padding: 16px;
+  /* Diagrams taller than this are scaled down to it, proportions kept, as in mdread
+     (--max-diagram-height). none turns it off. */
+  --fran-diagram-max-height: 80vh;
+}
+
+/* The height limit, as a length. none, or anything else that isn't a length (such as a value
+   half typed into Style Settings), makes the box inherit it instead; nothing above the box
+   sets it, so it's this initial value: no limit, rather than an invalid max-width that lets
+   a diagram overflow its box. main.js's fitHeight falls back to the same value. */
+@property --fran-diagram-cap {
+  syntax: "<length>";
+  inherits: true;
+  initial-value: 100000px;
+}
+
+.fran-diagram,
+.fran-dialog {
+  /* Pele's colors (mdread's --pele-*) and fonts */
+  --pele-bg: var(--fran-diagram-bg, var(--code-background));
+  --pele-fg: var(--fran-diagram-fg, var(--text-normal));
+  --pele-line: var(--fran-diagram-line, var(--text-normal));
+  --pele-muted: var(--fran-diagram-muted, var(--text-muted));
+  --pele-surface: var(--fran-diagram-surface, var(--background-primary));
+  --pele-surface-alt: var(--fran-diagram-surface-alt, var(--background-secondary));
+  --pele-border: var(--fran-diagram-border, var(--background-modifier-border));
+  --pele-accent: var(--fran-diagram-accent, var(--interactive-accent));
+  --pele-error: var(--fran-diagram-error, var(--text-error));
+  --pele-critical: var(--fran-diagram-error, var(--text-error));
+  --pele-font: var(--font-text);
+  --pele-font-mono: var(--font-monospace);
+
+  /* Button colors (mdread's --mdr-btn-* and --mdr-focus) */
+  --fran-tool-bg: var(--fran-btn-bg, var(--interactive-normal));
+  --fran-tool-border: var(--fran-btn-border, var(--background-modifier-border));
+  --fran-tool-fg: var(--fran-btn-fg, var(--text-muted));
+  --fran-tool-text-fg: var(--fran-btn-text-fg, var(--text-muted));
+  --fran-tool-hover-bg: var(--fran-btn-hover-bg, var(--interactive-hover));
+  --fran-tool-hover-fg: var(--fran-btn-hover-fg, var(--text-normal));
+  --fran-tool-focus: var(--fran-btn-focus, var(--interactive-accent));
+
+  /* The height limit: a length, or none (see @property above) */
+  --fran-diagram-cap: var(--fran-diagram-max-height);
+}
+
+/* --- The diagram box ------------------------------------------------------ */
+
+.fran-diagram {
+  position: relative;
+  overflow: clip;
+  background: var(--pele-bg);
+  border-radius: 6px;
+  /* Pele's zoom controls go bottom right, 8px from the corner, under the diagram buttons and
+     lined up with them. Pele positions them in its container, whose padding box is the box's. */
+  --pele-zoom-top: auto;
+  --pele-zoom-bottom: 8px;
+  --pele-zoom-right: 8px;
+}
+
+/* The padding is on Pele's container rather than the box: zoomed in, Pele draws over its
+   container's padding, so the zoomed diagram reaches the box's edges, clipped to its rounded
+   corners. The clip would hide the focus ring Pele's zoomable SVG gets outside it, so the ring,
+   the buttons' one, goes inside. */
+.fran-diagram > .fran-diagram-pele {
+  padding: var(--fran-diagram-padding);
+}
+
+.fran-diagram > .fran-diagram-pele > svg:focus-visible {
+  outline: 2px solid var(--fran-tool-focus);
+  outline-offset: -2px;
+}
+
+/* Pele's zoom controls in a row rather than its column: [reset - +]. Pele shows its reset button,
+   after + and -, once zoomed in; reversed, the row grows to the left, so + and - stay under the
+   cursor. Pele sets the direction inline, which only !important overrides.
+   They look like the diagram buttons: Pele's inline styles read these --pele-* variables, set
+   here so the diagram keeps its own. Like the buttons, they show on hover or with keyboard focus,
+   the zoomable diagram's included. */
+.fran-diagram .pele-zoom {
+  flex-direction: row-reverse !important;
+  --pele-bg: var(--fran-tool-bg);
+  --pele-fg: var(--fran-tool-fg);
+  --pele-border: var(--fran-tool-border);
+  --pele-radius: 6px;
+  opacity: 0;
+  transition: opacity 0.15s;
+}
+
+.fran-diagram:hover .pele-zoom,
+.fran-diagram:has(:focus-visible) .pele-zoom {
+  opacity: 1;
+}
+
+/* Obsidian gives buttons a shadow (none on macOS) and a ring of its own when focused */
+.fran-diagram .pele-zoom > button {
+  box-shadow: none;
+}
+
+/* Pele sets its buttons' transparent background and inherited color inline too, hence
+   !important. It disables + or - at its zoom limits. */
+.fran-diagram .pele-zoom > button:hover:not(:disabled) {
+  color: var(--fran-tool-hover-fg) !important;
+  background: var(--fran-tool-hover-bg) !important;
+}
+
+/* A diagram too short for the diagram buttons above the zoom row gets the height they need,
+   with the diagram centered in it: 8px + 26px buttons + 8px + 30px zoom row + 8px, padding
+   included (Obsidian sizes boxes border-box) */
+.fran-diagram > .fran-diagram-pele:has(> .pele-zoom:not([hidden])) {
+  display: grid;
+  align-content: center;
+  min-height: 80px;
+}
+
+.fran-diagram-pele > svg {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  margin: 0 auto;
+}
+
+.fran-diagram-tools {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  z-index: 1;
+  display: flex;
+  gap: 4px;
+  opacity: 0;
+  transition: opacity 0.15s;
+}
+
+.fran-diagram:hover > .fran-diagram-tools,
+.fran-diagram-tools:has(:focus-visible) {
+  opacity: 1;
+}
+
+/* Live Preview puts its own edit button (30px wide, 4px from the corner) at the top right;
+   the buttons go in line with it, to its left */
+.cm-embed-block .fran-diagram-tools {
+  top: 4px;
+  right: 38px;
+}
+
+/* Pele's parse errors point at the column with a caret on the line below */
+.fran-diagram-error {
+  font-family: var(--font-monospace);
+  font-size: var(--code-size);
+  white-space: pre-wrap;
+  color: var(--fran-diagram-error, var(--text-error));
+}
+
+/* Obsidian styles every button; these are mdread's small square ones */
+.fran-diagram button.fran-tool,
+.fran-dialog button.fran-tool {
+  display: inline-flex;
+  width: auto;
+  height: auto;
+  padding: 4px;
+  line-height: 1;
+  color: var(--fran-tool-fg);
+  background: var(--fran-tool-bg);
+  border: 1px solid var(--fran-tool-border);
+  border-radius: 6px;
+  box-shadow: none;
+  cursor: pointer;
+}
+
+.fran-diagram button.fran-tool:hover,
+.fran-dialog button.fran-tool:hover {
+  color: var(--fran-tool-hover-fg);
+  background: var(--fran-tool-hover-bg);
+}
+
+/* The copy button under a diagram Pele couldn't draw is Obsidian's kind, which Obsidian turns
+   green inline; this one is the plugin's */
+.fran-diagram button.fran-tool.is-copied,
+.fran-diagram-error + pre > button.copy-code-button.is-copied {
+  color: var(--text-success);
+}
+
+/* Obsidian's focus ring is a box-shadow, which the buttons' rules remove; Pele's buttons lose it
+   above */
+.fran-diagram button.fran-tool:focus-visible,
+.fran-dialog button.fran-tool:focus-visible,
+.fran-dialog .fran-zoom > button:focus-visible,
+.fran-diagram .pele-zoom > button:focus-visible {
+  outline: 2px solid var(--fran-tool-focus);
+  outline-offset: -2px;
+}
+
+/* --- The expanded view ------------------------------------------------------ */
+
+.fran-dialog {
+  box-sizing: border-box;
+  width: calc(100vw - 48px);
+  height: calc(100vh - 48px);
+  max-width: none;
+  max-height: none;
+  margin: auto;
+  padding: 0;
+  overflow: hidden;
+  font-family: var(--font-text);
+  color: var(--pele-fg);
+  background: var(--pele-bg);
+  border: 1px solid var(--fran-tool-border);
+  border-radius: 12px;
+}
+
+.fran-dialog::backdrop {
+  background: var(--fran-diagram-backdrop, var(--background-modifier-cover));
+}
+
+.fran-dialog > .fran-tool {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  z-index: 1;
+}
+
+/* Dragging scrolls it to pan; the zoom sets the diagram's size */
+.fran-dialog-view {
+  box-sizing: border-box;
+  display: flex;
+  width: 100%;
+  height: 100%;
+  padding: 48px 24px;
+  overflow: auto;
+  overflow-anchor: none;
+  cursor: grab;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.fran-dialog-view.fran-panning {
+  cursor: grabbing;
+}
+
+.fran-dialog-view:focus {
+  outline: none;
+}
+
+.fran-dialog-view > * {
+  flex: none;
+  margin: auto;
+}
+
+.fran-dialog-view > .fran-diagram-pele > svg {
+  max-width: none;
+}
+
+.fran-zoom {
+  position: absolute;
+  right: 12px;
+  bottom: 12px;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  background: var(--fran-tool-bg);
+  border: 1px solid var(--fran-tool-border);
+  border-radius: 6px;
+}
+
+.fran-dialog .fran-zoom > button {
+  width: auto;
+  height: auto;
+  padding: 4px 6px;
+  font: inherit;
+  line-height: 1;
+  color: var(--fran-tool-fg);
+  background: none;
+  border: 0;
+  border-radius: 5px;
+  box-shadow: none;
+  cursor: pointer;
+}
+
+.fran-dialog .fran-zoom > button:hover {
+  color: var(--fran-tool-hover-fg);
+  background: var(--fran-tool-hover-bg);
+}
+
+.fran-dialog .fran-zoom > button[aria-disabled="true"] {
+  opacity: 0.4;
+  cursor: default;
+  background: none;
+}
+
+/* Text, so it keeps 4.5:1 where the light icon gray is lighter */
+.fran-dialog .fran-zoom > .fran-zoom-level {
+  min-width: 5ch;
+  padding: 4px 2px;
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+  color: var(--fran-tool-text-fg);
+}

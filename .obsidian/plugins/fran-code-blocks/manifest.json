@@ -1,0 +1,10 @@
+{
+  "id": "fran-code-blocks",
+  "name": "Fran Code Blocks",
+  "version": "0.1.0",
+  "minAppVersion": "1.12.0",
+  "description": "In the editor, tells the theme how long each code block's longest line is, so a block whose long lines scroll instead of wrapping is drawn at one width.",
+  "author": "Fran",
+  "authorUrl": "https://github.com/ffyeins",
+  "isDesktopOnly": false
+}

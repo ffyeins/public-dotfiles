@@ -1,0 +1,10 @@
+{
+  "id": "fran-diagrams",
+  "name": "Fran Diagrams",
+  "version": "0.1.0",
+  "minAppVersion": "1.12.0",
+  "description": "Draws Mermaid diagrams with Pele, as mdread does, with buttons to copy the source, download SVG and expand to a full-window view with pan and zoom.",
+  "author": "Fran",
+  "authorUrl": "https://github.com/ffyeins",
+  "isDesktopOnly": false
+}

@@ -47,7 +47,7 @@ SCRIPTS_DIR=~/dotfiles/scripts
 
 alias cheat="$SCRIPTS_DIR/fuzzy-cheatsheet/fuzzy_cheatsheet.sh"
 alias mdprint="$SCRIPTS_DIR/mdprint.sh"
-alias mdread="$SCRIPTS_DIR/mdread/mdread"
+alias mdread="$SCRIPTS_DIR/mdread/mdread --light"
 alias mdtohtml="$SCRIPTS_DIR/mdread/mdtohtml"
 
 alias runcaffeinate="$SCRIPTS_DIR/run_caffeinate.sh"

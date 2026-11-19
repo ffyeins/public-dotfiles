@@ -1,12 +1,12 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-VERSION="2.0.0"
+VERSION="2.2.0"
 prog=mdtohtml
 
 usage() {
   cat <<'EOF'
-Usage: mdtohtml [--light|--dark] [--force] [--] <file.md> [file2.md ...]
+Usage: mdtohtml [--light|--dark] [--mermaid NAME] [--max-diagram-height H] [--force] [--] <file.md> [file2.md ...]
 
 Convert markdown files to GitHub-style HTML files.
 Each input file produces a .html file in the same directory (README.md -> README.html).
@@ -16,6 +16,11 @@ diagrams load from CDNs when the page is viewed.
 Options:
   --light        Render with the GitHub light theme
   --dark         Render with the GitHub dark theme (default)
+  --mermaid NAME Diagram renderer: pele (default), beautiful-mermaid (pele
+                 draws the types it lacks), or mermaid (mermaid.js)
+  --max-diagram-height H
+                 Scale down diagrams taller than H: a size in px or vh such as
+                 600px (or 600) or 50vh, or none. Default: 80vh
   -f, --force    Overwrite existing .html files that mdtohtml didn't generate
   -h, --help     Show this help
   -v, --version  Show the version
@@ -76,7 +81,7 @@ for file in "${files[@]}"; do
     failed=1
     continue
   fi
-  if mdr_render_html "$file" "$theme" > "$tmp"; then
+  if mdr_render_html "$file" "$theme" "$mermaid" "$max_height" > "$tmp"; then
     chmod "$mode" "$tmp"
     mv -f "$tmp" "$outfile"
     printf '%s\n' "$outfile"

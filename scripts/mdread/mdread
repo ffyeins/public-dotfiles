@@ -1,12 +1,12 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-VERSION="5.0.0"
+VERSION="5.2.0"
 prog=mdread
 
 usage() {
   cat <<'EOF'
-Usage: mdread [--light|--dark] [--] <file.md> [file2.md ...]
+Usage: mdread [--light|--dark] [--mermaid NAME] [--max-diagram-height H] [--] <file.md> [file2.md ...]
 
 Render markdown files to GitHub-style HTML and open them in the browser.
 Markdown is rendered locally with comrak; styling, syntax highlighting, math and
@@ -15,6 +15,11 @@ diagrams load from CDNs when available.
 Options:
   --light        Render with the GitHub light theme
   --dark         Render with the GitHub dark theme (default)
+  --mermaid NAME Diagram renderer: pele (default), beautiful-mermaid (pele
+                 draws the types it lacks), or mermaid (mermaid.js)
+  --max-diagram-height H
+                 Scale down diagrams taller than H: a size in px or vh such as
+                 600px (or 600) or 50vh, or none. Default: 80vh
   -h, --help     Show this help
   -v, --version  Show the version
   --             Treat every following argument as a file
@@ -68,7 +73,7 @@ for file in "${files[@]}"; do
   # The page lives in the temp dir, so point <base> at the markdown file's directory for
   # relative images and links
   dir=$(CDPATH='' cd -- "$(dirname -- "$file")" && pwd -P)
-  if mdr_render_html "$file" "$theme" "$(mdr_dir_url "$dir")" > "$page"; then
+  if mdr_render_html "$file" "$theme" "$mermaid" "$max_height" "$(mdr_dir_url "$dir")" > "$page"; then
     ready+=("$page")
   else
     echo "$prog: failed to render '$file'" >&2
