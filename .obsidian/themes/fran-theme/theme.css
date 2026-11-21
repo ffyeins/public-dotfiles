@@ -4,8 +4,8 @@
    fran-theme
    --------------------------------------------------------------------------
    Obsidian notes that look like GitHub's markdown, as mdread (~/dev/mdread)
-   renders it, in light and dark. CLAUDE.md describes the source files and
-   how they fit together.
+   renders it, in light and dark, or in AnuPpuccin's colors. CLAUDE.md
+   describes the source files and how they fit together.
 
    The @settings block below is for the Style Settings plugin. Each id is
    the variable's name without "--". Its defaults are only what its
@@ -32,16 +32,33 @@ settings:
 
   - id: fran-note-color-mode
     title: Color scheme of notes
-    description: Notes in reading view and the editor can be light or dark whatever the rest of the app is.
+    description: Notes in reading view and the editor, whatever the rest of the app is.
     type: variable-select
-    default: auto
+    default: github-light
     options:
-      - label: Same as the app
-        value: auto
-      - label: Light
-        value: light
-      - label: Dark
-        value: dark
+      - label: GitHub light
+        value: github-light
+      - label: GitHub dark
+        value: github-dark
+      - label: AnuPpuccin Latte
+        value: anuppuccin-latte
+      - label: AnuPpuccin Frappé
+        value: anuppuccin-frappe
+
+  - id: fran-pdf-color-mode
+    title: Color scheme of PDFs
+    description: Notes exported to PDF, whatever the color scheme of notes in the app. fran-pdf's export dialog starts at it.
+    type: variable-select
+    default: github-light
+    options:
+      - label: GitHub light
+        value: github-light
+      - label: GitHub dark
+        value: github-dark
+      - label: AnuPpuccin Latte
+        value: anuppuccin-latte
+      - label: AnuPpuccin Frappé
+        value: anuppuccin-frappe
 
 */
 
@@ -132,144 +149,192 @@ settings:
    these onto Obsidian's variables inside notes. The rest of the app has
    its own palette, 10-palette-ui.css, and neither side reads the other's.
 
-   Values are GitHub's Primer design tokens (@primer/primitives 11.10,
-   functional/themes/light.css and dark.css). They're the colors
-   github-markdown-css 5.9.0 uses, which is what mdread renders with. Names
-   follow Primer's: --fran-note-<fg|bg|border>-<role>. The six hues are
-   stored as "r, g, b" triplets, since Obsidian's extended colors come in
-   both forms (--color-red-rgb and --color-red); everything else is hex.
-   The exception is each set's first group: the color scheme itself and
-   Obsidian's own values for it (app.css), which notes read.
+   Notes are in the scheme --fran-note-color-mode (30-options.css) names,
+   whatever the app's color scheme:
+   - github-light, github-dark: GitHub's Primer design tokens
+     (@primer/primitives 11.10, functional/themes/light.css and dark.css).
+     They're the colors github-markdown-css 5.9.0 uses, which is what
+     mdread renders with. Comments name the tokens.
+   - anuppuccin-latte, anuppuccin-frappe: the AnuPpuccin theme's (1.5.0)
+     Latte and Frappé flavors, set up as the user had it: the maroon
+     accent, its default heading colors, and yellow bold and italic.
+     Comments name the Catppuccin color, as AnuPpuccin's own values (they
+     differ from Catppuccin's in places).
+
+   Every set lists the same variables. Names say what a color is for,
+   --fran-note-<fg|bg|border>-<role> as in Primer, and the syntax colors
+   follow Obsidian's --code-* roles. The hues are Obsidian's extended
+   colors plus the accent, stored as "r, g, b" triplets, since Obsidian's
+   extended colors come in both forms (--color-red-rgb and --color-red);
+   everything else is a color. currentColor means the surrounding text's,
+   as Obsidian's own "inherit" default does. Each set starts with the
+   color scheme itself and the values Obsidian sets per scheme (app.css's
+   .theme-light / .theme-dark) that notes read.
 
    The copy-code button's and the diagrams' colors keep the names the
    fran-diagrams plugin reads: --fran-btn-* and --fran-diagram-*.
+   AnuPpuccin has none of its own, so its sets give its colors the roles
+   the GitHub sets give Primer's.
 
-   Notes have a color scheme of their own: --fran-note-color-mode
-   (30-options.css) when it's light or dark, else the app's. The set for
-   that scheme goes on body's children, so the whole page reads it, the
-   expanded diagram view included. Not on body: a container style query
-   reads the element's parent, and the option is on body.
+   GitHub light comes first, with no condition: it's the default, and what
+   notes get when the option names no scheme. Each other set is in an
+   @container that matches its name, and overrides every variable. The
+   sets go on body's children, so the whole page reads them, the expanded
+   diagram view included. Not on body: a container style query reads the
+   element's parent, and the option is on body.
+
+   Notes exported to PDF are in the scheme --fran-pdf-color-mode names.
+   Obsidian prints from body > .print, both its own export and fran-pdf.
+   That element passes the option on to its children as
+   --fran-note-color-mode, and the sets go on them too.
    ========================================================================== */
 
-/* The app's color scheme, which the conditions below read */
-.theme-light {
-  --fran-app-color-scheme: light;
+body > .print {
+  --fran-note-color-mode: var(--fran-pdf-color-mode);
 }
 
-.theme-dark {
-  --fran-app-color-scheme: dark;
+/* GitHub light */
+body > *,
+body > .print > * {
+  /* The color scheme, and Obsidian's own values for it (app.css's
+     .theme-light) that notes read. They're here because a note's color
+     scheme can differ from the app's. */
+  --fran-note-color-scheme: light;               /* native controls, scrollbars */
+  --fran-note-mono-100: black;                   /* indentation guides */
+  --fran-note-highlight-mix-blend-mode: darken;  /* callouts, search matches */
+
+  /* Hues as r, g, b */
+  --fran-note-accent-rgb: 9, 105, 218;       /* #0969da fgColor-accent: links, tags */
+  --fran-note-red-rgb: 209, 36, 47;          /* #d1242f fgColor-danger */
+  --fran-note-orange-rgb: 188, 76, 0;        /* #bc4c00 fgColor-severe */
+  --fran-note-yellow-rgb: 154, 103, 0;       /* #9a6700 fgColor-attention */
+  --fran-note-green-rgb: 26, 127, 55;        /* #1a7f37 fgColor-success */
+  --fran-note-blue-rgb: 9, 105, 218;         /* #0969da fgColor-accent */
+  --fran-note-purple-rgb: 130, 80, 223;      /* #8250df fgColor-done */
+  --fran-note-cyan-rgb: 0, 191, 188;         /* #00bfbc Obsidian's (GitHub has none): summary callouts */
+
+  /* Text */
+  --fran-note-fg-default: #1f2328;
+  --fran-note-fg-muted: #59636e;
+  --fran-note-fg-disabled: #818b98;
+  --fran-note-fg-on-emphasis: #ffffff;
+  --fran-note-fg-h1: currentColor;
+  --fran-note-fg-h2: currentColor;
+  --fran-note-fg-h3: currentColor;
+  --fran-note-fg-h4: currentColor;
+  --fran-note-fg-h5: currentColor;
+  --fran-note-fg-h6: #59636e;                /* fgColor-muted */
+  --fran-note-fg-bold: currentColor;
+  --fran-note-fg-italic: currentColor;
+  --fran-note-fg-quote: #59636e;             /* fgColor-muted */
+  --fran-note-fg-list-marker: #1f2328;       /* fgColor-default */
+
+  /* Backgrounds */
+  --fran-note-bg-default: #ffffff;
+  --fran-note-bg-muted: #f6f8fa;             /* code blocks */
+  --fran-note-bg-inset: #f6f8fa;             /* search results in a note */
+  --fran-note-bg-neutral-muted: #818b981f;   /* hovered items */
+  --fran-note-bg-code-inline: #818b981f;     /* bgColor-neutral-muted */
+  --fran-note-bg-table-stripe: #f6f8fa;      /* bgColor-muted */
+  --fran-note-bg-quote: transparent;
+  --fran-note-bg-accent-muted: #ddf4ff;      /* tags (GitHub's topic labels) */
+  --fran-note-bg-accent-emphasis: #0969da;   /* checked boxes, buttons */
+  --fran-note-bg-attention-muted: #fff8c5;   /* ==highlights== */
+  --fran-note-bg-control: #f6f8fa;           /* buttons */
+  --fran-note-bg-control-hover: #eff2f5;
+  --fran-note-selection: #0969da33;
+
+  /* Borders */
+  --fran-note-border-default: #d1d9e0;
+  --fran-note-border-muted: #d1d9e0b3;
+  --fran-note-border-emphasis: #818b98;
+  --fran-note-border-quote: #d1d9e0;         /* borderColor-default */
+  --fran-note-border-checkbox: #818b98;      /* borderColor-emphasis */
+
+  /* Syntax highlighting, by Obsidian's roles (Primer's
+     prettylights-syntax-*) */
+  --fran-note-syntax-comment: #59636e;       /* comment */
+  --fran-note-syntax-function: #6639ba;      /* entity */
+  --fran-note-syntax-important: #953800;     /* variable */
+  --fran-note-syntax-keyword: #cf222e;       /* keyword */
+  --fran-note-syntax-operator: #cf222e;      /* keyword */
+  --fran-note-syntax-property: #0550ae;      /* constant */
+  --fran-note-syntax-punctuation: #1f2328;   /* fgColor-default */
+  --fran-note-syntax-string: #0a3069;        /* string */
+  --fran-note-syntax-tag: #0550ae;           /* entity-tag */
+  --fran-note-syntax-value: #0550ae;         /* constant */
+
+  /* Buttons (the copy-code button, the diagrams' and the expanded
+     view's): mdread's --mdr-btn-* and --mdr-focus (lib/render.sh). Two
+     depart from Primer's control tokens, as in mdread: the background,
+     since control-bgColor-rest is the diagram box's color, and the icon
+     gray, since fgColor-muted looked too dark on white. */
+  --fran-btn-bg: #ffffff;          /* bgColor-default */
+  --fran-btn-border: #d1d9e0;      /* borderColor-default */
+  --fran-btn-fg: #818b98;          /* fgColor-disabled: icons */
+  --fran-btn-text-fg: #59636e;     /* fgColor-muted: text, 4.5:1 on white */
+  --fran-btn-hover-bg: #eff2f5;    /* control-bgColor-hover */
+  --fran-btn-hover-fg: #1f2328;    /* fgColor-default */
+  --fran-btn-focus: #0969da;       /* borderColor-accent-emphasis */
+
+  /* Mermaid diagrams: mdread's Pele colors (--pele-*), which the
+     fran-diagrams plugin (plugin/) hands to Pele. The box is GitHub's code
+     block color; nodes are a different shade so they stand out. */
+  --fran-diagram-bg: #f6f8fa;
+  --fran-diagram-fg: #1f2328;
+  --fran-diagram-line: #1f2328;
+  --fran-diagram-muted: #59636e;
+  --fran-diagram-surface: #ffffff;
+  --fran-diagram-surface-alt: #eff2f5;
+  --fran-diagram-border: #d1d9e0;
+  --fran-diagram-accent: #0969da;
+  --fran-diagram-error: #d1242f;
+  --fran-diagram-backdrop: #c8d1da66;   /* behind the expanded view: overlay-backdrop-bgColor */
 }
 
-/* Light: notes set to light, or the app light and notes not set to dark */
-@container style(--fran-note-color-mode: light) or
-  (style(--fran-app-color-scheme: light) and (not style(--fran-note-color-mode: dark))) {
-  body > * {
-    /* The color scheme, and Obsidian's own values for it (app.css's
-       .theme-light) that notes read. They're here because a note's color
-       scheme can differ from the app's. */
-    --fran-note-color-scheme: light;               /* native controls, scrollbars */
-    --fran-note-cyan-rgb: 0, 191, 188;             /* #00bfbc summary callouts */
-    --fran-note-mono-100: black;                   /* indentation guides */
-    --fran-note-highlight-mix-blend-mode: darken;  /* callouts, search matches */
-
-    /* Hues as r, g, b */
-    --fran-note-accent-rgb: 9, 105, 218;       /* #0969da fgColor-accent */
-    --fran-note-success-rgb: 26, 127, 55;      /* #1a7f37 fgColor-success */
-    --fran-note-attention-rgb: 154, 103, 0;    /* #9a6700 fgColor-attention */
-    --fran-note-severe-rgb: 188, 76, 0;        /* #bc4c00 fgColor-severe */
-    --fran-note-danger-rgb: 209, 36, 47;       /* #d1242f fgColor-danger */
-    --fran-note-done-rgb: 130, 80, 223;        /* #8250df fgColor-done */
-
-    /* Text */
-    --fran-note-fg-default: #1f2328;
-    --fran-note-fg-muted: #59636e;
-    --fran-note-fg-disabled: #818b98;
-    --fran-note-fg-on-emphasis: #ffffff;
-
-    /* Backgrounds */
-    --fran-note-bg-default: #ffffff;
-    --fran-note-bg-muted: #f6f8fa;             /* code blocks, table stripes */
-    --fran-note-bg-inset: #f6f8fa;             /* search results in a note */
-    --fran-note-bg-neutral-muted: #818b981f;   /* inline code, hovered items */
-    --fran-note-bg-accent-muted: #ddf4ff;      /* tags (GitHub's topic labels) */
-    --fran-note-bg-accent-emphasis: #0969da;   /* checked boxes, buttons */
-    --fran-note-bg-attention-muted: #fff8c5;   /* ==highlights== */
-    --fran-note-bg-control: #f6f8fa;           /* buttons */
-    --fran-note-bg-control-hover: #eff2f5;
-    --fran-note-selection: #0969da33;
-
-    /* Borders */
-    --fran-note-border-default: #d1d9e0;
-    --fran-note-border-muted: #d1d9e0b3;
-    --fran-note-border-emphasis: #818b98;
-
-    /* Syntax highlighting (Primer's prettylights-syntax-*) */
-    --fran-note-syntax-comment: #59636e;
-    --fran-note-syntax-constant: #0550ae;
-    --fran-note-syntax-entity: #6639ba;
-    --fran-note-syntax-entity-tag: #0550ae;
-    --fran-note-syntax-keyword: #cf222e;
-    --fran-note-syntax-string: #0a3069;
-    --fran-note-syntax-variable: #953800;
-
-    /* Buttons (the copy-code button, the diagrams' and the expanded
-       view's): mdread's --mdr-btn-* and --mdr-focus (lib/render.sh). Two
-       depart from Primer's control tokens, as in mdread: the background,
-       since control-bgColor-rest is the diagram box's color, and the icon
-       gray, since fgColor-muted looked too dark on white. */
-    --fran-btn-bg: #ffffff;          /* bgColor-default */
-    --fran-btn-border: #d1d9e0;      /* borderColor-default */
-    --fran-btn-fg: #818b98;          /* fgColor-disabled: icons */
-    --fran-btn-text-fg: #59636e;     /* fgColor-muted: text, 4.5:1 on white */
-    --fran-btn-hover-bg: #eff2f5;    /* control-bgColor-hover */
-    --fran-btn-hover-fg: #1f2328;    /* fgColor-default */
-    --fran-btn-focus: #0969da;       /* borderColor-accent-emphasis */
-
-    /* Mermaid diagrams: mdread's Pele colors (--pele-*), which the
-       fran-diagrams plugin (plugin/) hands to Pele. The box is GitHub's code
-       block color; nodes are a different shade so they stand out. */
-    --fran-diagram-bg: #f6f8fa;
-    --fran-diagram-fg: #1f2328;
-    --fran-diagram-line: #1f2328;
-    --fran-diagram-muted: #59636e;
-    --fran-diagram-surface: #ffffff;
-    --fran-diagram-surface-alt: #eff2f5;
-    --fran-diagram-border: #d1d9e0;
-    --fran-diagram-accent: #0969da;
-    --fran-diagram-error: #d1242f;
-    --fran-diagram-backdrop: #c8d1da66;   /* behind the expanded view: overlay-backdrop-bgColor */
-  }
-}
-
-/* Dark: notes set to dark, or the app dark and notes not set to light */
-@container style(--fran-note-color-mode: dark) or
-  (style(--fran-app-color-scheme: dark) and (not style(--fran-note-color-mode: light))) {
-  body > * {
+/* GitHub dark */
+@container style(--fran-note-color-mode: github-dark) {
+  body > *,
+  body > .print > * {
     /* The color scheme, and Obsidian's own values for it (.theme-dark) */
     --fran-note-color-scheme: dark;
-    --fran-note-cyan-rgb: 83, 223, 221;            /* #53dfdd */
     --fran-note-mono-100: white;
     --fran-note-highlight-mix-blend-mode: lighten;
 
     /* Hues as r, g, b */
     --fran-note-accent-rgb: 68, 147, 248;      /* #4493f8 fgColor-accent */
-    --fran-note-success-rgb: 63, 185, 80;      /* #3fb950 fgColor-success */
-    --fran-note-attention-rgb: 210, 153, 34;   /* #d29922 fgColor-attention */
-    --fran-note-severe-rgb: 219, 109, 40;      /* #db6d28 fgColor-severe */
-    --fran-note-danger-rgb: 248, 81, 73;       /* #f85149 fgColor-danger */
-    --fran-note-done-rgb: 171, 125, 248;       /* #ab7df8 fgColor-done */
+    --fran-note-red-rgb: 248, 81, 73;          /* #f85149 fgColor-danger */
+    --fran-note-orange-rgb: 219, 109, 40;      /* #db6d28 fgColor-severe */
+    --fran-note-yellow-rgb: 210, 153, 34;      /* #d29922 fgColor-attention */
+    --fran-note-green-rgb: 63, 185, 80;        /* #3fb950 fgColor-success */
+    --fran-note-blue-rgb: 68, 147, 248;        /* #4493f8 fgColor-accent */
+    --fran-note-purple-rgb: 171, 125, 248;     /* #ab7df8 fgColor-done */
+    --fran-note-cyan-rgb: 83, 223, 221;        /* #53dfdd Obsidian's */
 
     /* Text */
     --fran-note-fg-default: #f0f6fc;
     --fran-note-fg-muted: #9198a1;
     --fran-note-fg-disabled: #656c76;
     --fran-note-fg-on-emphasis: #ffffff;
+    --fran-note-fg-h1: currentColor;
+    --fran-note-fg-h2: currentColor;
+    --fran-note-fg-h3: currentColor;
+    --fran-note-fg-h4: currentColor;
+    --fran-note-fg-h5: currentColor;
+    --fran-note-fg-h6: #9198a1;                /* fgColor-muted */
+    --fran-note-fg-bold: currentColor;
+    --fran-note-fg-italic: currentColor;
+    --fran-note-fg-quote: #9198a1;             /* fgColor-muted */
+    --fran-note-fg-list-marker: #f0f6fc;       /* fgColor-default */
 
     /* Backgrounds */
     --fran-note-bg-default: #0d1117;
     --fran-note-bg-muted: #151b23;
     --fran-note-bg-inset: #010409;
     --fran-note-bg-neutral-muted: #656c7633;
+    --fran-note-bg-code-inline: #656c7633;     /* bgColor-neutral-muted */
+    --fran-note-bg-table-stripe: #151b23;      /* bgColor-muted */
+    --fran-note-bg-quote: transparent;
     --fran-note-bg-accent-muted: #388bfd1a;
     --fran-note-bg-accent-emphasis: #1f6feb;
     --fran-note-bg-attention-muted: #bb800926;
@@ -281,15 +346,20 @@ settings:
     --fran-note-border-default: #3d444d;
     --fran-note-border-muted: #3d444db3;
     --fran-note-border-emphasis: #656c76;
+    --fran-note-border-quote: #3d444d;         /* borderColor-default */
+    --fran-note-border-checkbox: #656c76;      /* borderColor-emphasis */
 
     /* Syntax highlighting */
-    --fran-note-syntax-comment: #9198a1;
-    --fran-note-syntax-constant: #79c0ff;
-    --fran-note-syntax-entity: #d2a8ff;
-    --fran-note-syntax-entity-tag: #7ee787;
-    --fran-note-syntax-keyword: #ff7b72;
-    --fran-note-syntax-string: #a5d6ff;
-    --fran-note-syntax-variable: #ffa657;
+    --fran-note-syntax-comment: #9198a1;       /* comment */
+    --fran-note-syntax-function: #d2a8ff;      /* entity */
+    --fran-note-syntax-important: #ffa657;     /* variable */
+    --fran-note-syntax-keyword: #ff7b72;       /* keyword */
+    --fran-note-syntax-operator: #ff7b72;      /* keyword */
+    --fran-note-syntax-property: #79c0ff;      /* constant */
+    --fran-note-syntax-punctuation: #f0f6fc;   /* fgColor-default */
+    --fran-note-syntax-string: #a5d6ff;        /* string */
+    --fran-note-syntax-tag: #7ee787;           /* entity-tag */
+    --fran-note-syntax-value: #79c0ff;         /* constant */
 
     /* Buttons */
     --fran-btn-bg: #212830;          /* control-bgColor-rest */
@@ -311,6 +381,192 @@ settings:
     --fran-diagram-accent: #4493f8;
     --fran-diagram-error: #f85149;
     --fran-diagram-backdrop: #21283066;
+  }
+}
+
+/* AnuPpuccin Latte */
+@container style(--fran-note-color-mode: anuppuccin-latte) {
+  body > *,
+  body > .print > * {
+    /* The color scheme, and the values notes read that Obsidian sets per
+       scheme: AnuPpuccin's (its .theme-light), else Obsidian's */
+    --fran-note-color-scheme: light;
+    --fran-note-mono-100: black;                   /* Obsidian's */
+    --fran-note-highlight-mix-blend-mode: normal;  /* AnuPpuccin's "none", which acts as normal */
+
+    /* Hues as r, g, b: Obsidian's extended colors as AnuPpuccin sets them */
+    --fran-note-accent-rgb: 230, 69, 83;       /* #e64553 maroon */
+    --fran-note-red-rgb: 210, 15, 57;          /* #d20f39 red */
+    --fran-note-orange-rgb: 254, 100, 11;      /* #fe640b peach */
+    --fran-note-yellow-rgb: 228, 147, 32;      /* #e49320 yellow */
+    --fran-note-green-rgb: 64, 160, 43;        /* #40a02b green */
+    --fran-note-blue-rgb: 42, 110, 245;        /* #2a6ef5 blue */
+    --fran-note-purple-rgb: 114, 135, 253;     /* #7287fd lavender */
+    --fran-note-cyan-rgb: 4, 165, 229;         /* #04a5e5 sky */
+
+    /* Text */
+    --fran-note-fg-default: #4c4f69;           /* text */
+    --fran-note-fg-muted: #7c7f93;             /* overlay2 */
+    --fran-note-fg-disabled: #6c6f85;          /* subtext0: AnuPpuccin's faint text */
+    --fran-note-fg-on-emphasis: #eff1f5;       /* base */
+    --fran-note-fg-h1: #d20f39;                /* red */
+    --fran-note-fg-h2: #fe640b;                /* peach */
+    --fran-note-fg-h3: #40a02b;                /* green */
+    --fran-note-fg-h4: #179299;                /* teal */
+    --fran-note-fg-h5: #7287fd;                /* lavender */
+    --fran-note-fg-h6: #8839ef;                /* mauve */
+    --fran-note-fg-bold: #e49320;              /* yellow */
+    --fran-note-fg-italic: #e49320;            /* yellow */
+    --fran-note-fg-quote: currentColor;
+    --fran-note-fg-list-marker: #6c6f85;       /* subtext0 */
+
+    /* Backgrounds */
+    --fran-note-bg-default: #eff1f5;           /* base */
+    --fran-note-bg-muted: #dce0e8;             /* crust: AnuPpuccin's code background */
+    --fran-note-bg-inset: #e6e9ef;             /* mantle */
+    --fran-note-bg-neutral-muted: #4c4f6913;   /* text at 7.5% */
+    --fran-note-bg-code-inline: #dce0e8;       /* crust */
+    --fran-note-bg-table-stripe: #e6e9ef80;    /* mantle at 50%: AnuPpuccin's alternate rows option */
+    --fran-note-bg-quote: #dce0e880;           /* crust at 50% */
+    --fran-note-bg-accent-muted: #e645531a;    /* maroon at 10% */
+    --fran-note-bg-accent-emphasis: #e64553;   /* maroon */
+    --fran-note-bg-attention-muted: #e4932033; /* yellow at 20% */
+    --fran-note-bg-control: #ccd0da;           /* surface0 */
+    --fran-note-bg-control-hover: #bcc0cc;     /* surface1 */
+    --fran-note-selection: #e6455340;          /* maroon at 25% */
+
+    /* Borders */
+    --fran-note-border-default: #bcc0cc;       /* surface1 */
+    --fran-note-border-muted: #bcc0cc;         /* surface1 */
+    --fran-note-border-emphasis: #acb0be;      /* surface2 */
+    --fran-note-border-quote: #e64553;         /* maroon */
+    --fran-note-border-checkbox: #6c6f85;      /* subtext0 */
+
+    /* Syntax highlighting: Obsidian's defaults on AnuPpuccin's colors */
+    --fran-note-syntax-comment: #6c6f85;       /* subtext0 */
+    --fran-note-syntax-function: #e49320;      /* yellow */
+    --fran-note-syntax-important: #fe640b;     /* peach */
+    --fran-note-syntax-keyword: #ec83d0;       /* pink */
+    --fran-note-syntax-operator: #d20f39;      /* red */
+    --fran-note-syntax-property: #04a5e5;      /* sky */
+    --fran-note-syntax-punctuation: #7c7f93;   /* overlay2 */
+    --fran-note-syntax-string: #40a02b;        /* green */
+    --fran-note-syntax-tag: #d20f39;           /* red */
+    --fran-note-syntax-value: #7287fd;         /* lavender */
+
+    /* Buttons */
+    --fran-btn-bg: #eff1f5;          /* base */
+    --fran-btn-border: #bcc0cc;      /* surface1 */
+    --fran-btn-fg: #7c7f93;          /* overlay2 */
+    --fran-btn-text-fg: #6c6f85;     /* subtext0 */
+    --fran-btn-hover-bg: #ccd0da;    /* surface0 */
+    --fran-btn-hover-fg: #4c4f69;    /* text */
+    --fran-btn-focus: #e64553;       /* maroon */
+
+    /* Mermaid diagrams */
+    --fran-diagram-bg: #dce0e8;          /* crust */
+    --fran-diagram-fg: #4c4f69;          /* text */
+    --fran-diagram-line: #4c4f69;        /* text */
+    --fran-diagram-muted: #7c7f93;       /* overlay2 */
+    --fran-diagram-surface: #eff1f5;     /* base */
+    --fran-diagram-surface-alt: #e6e9ef; /* mantle */
+    --fran-diagram-border: #bcc0cc;      /* surface1 */
+    --fran-diagram-accent: #e64553;      /* maroon */
+    --fran-diagram-error: #d20f39;       /* red */
+    --fran-diagram-backdrop: #00000022;  /* AnuPpuccin's modal cover */
+  }
+}
+
+/* AnuPpuccin Frappé */
+@container style(--fran-note-color-mode: anuppuccin-frappe) {
+  body > *,
+  body > .print > * {
+    /* The color scheme, and the values notes read that Obsidian sets per
+       scheme: AnuPpuccin's (its .theme-dark), else Obsidian's */
+    --fran-note-color-scheme: dark;
+    --fran-note-mono-100: white;                   /* Obsidian's */
+    --fran-note-highlight-mix-blend-mode: normal;  /* AnuPpuccin's "none", which acts as normal */
+
+    /* Hues as r, g, b */
+    --fran-note-accent-rgb: 234, 153, 156;     /* #ea999c maroon */
+    --fran-note-red-rgb: 231, 130, 132;        /* #e78284 red */
+    --fran-note-orange-rgb: 239, 159, 118;     /* #ef9f76 peach */
+    --fran-note-yellow-rgb: 229, 200, 144;     /* #e5c890 yellow */
+    --fran-note-green-rgb: 166, 209, 137;      /* #a6d189 green */
+    --fran-note-blue-rgb: 140, 170, 238;       /* #8caaee blue */
+    --fran-note-purple-rgb: 186, 187, 241;     /* #babbf1 lavender */
+    --fran-note-cyan-rgb: 153, 209, 219;       /* #99d1db sky */
+
+    /* Text */
+    --fran-note-fg-default: #c6ceef;           /* text */
+    --fran-note-fg-muted: #949bb7;             /* overlay2 */
+    --fran-note-fg-disabled: #a5acc9;          /* subtext0: AnuPpuccin's faint text */
+    --fran-note-fg-on-emphasis: #303446;       /* base */
+    --fran-note-fg-h1: #e78284;                /* red */
+    --fran-note-fg-h2: #ef9f76;                /* peach */
+    --fran-note-fg-h3: #a6d189;                /* green */
+    --fran-note-fg-h4: #81c8be;                /* teal */
+    --fran-note-fg-h5: #babbf1;                /* lavender */
+    --fran-note-fg-h6: #ca9ee6;                /* mauve */
+    --fran-note-fg-bold: #e5c890;              /* yellow */
+    --fran-note-fg-italic: #e5c890;            /* yellow */
+    --fran-note-fg-quote: currentColor;
+    --fran-note-fg-list-marker: #a5acc9;       /* subtext0 */
+
+    /* Backgrounds */
+    --fran-note-bg-default: #303446;           /* base */
+    --fran-note-bg-muted: #232634;             /* crust: AnuPpuccin's code background */
+    --fran-note-bg-inset: #292c3c;             /* mantle */
+    --fran-note-bg-neutral-muted: #c6ceef13;   /* text at 7.5% */
+    --fran-note-bg-code-inline: #232634;       /* crust */
+    --fran-note-bg-table-stripe: #292c3c80;    /* mantle at 50%: AnuPpuccin's alternate rows option */
+    --fran-note-bg-quote: #23263480;           /* crust at 50% */
+    --fran-note-bg-accent-muted: #ea999c1a;    /* maroon at 10% */
+    --fran-note-bg-accent-emphasis: #ea999c;   /* maroon */
+    --fran-note-bg-attention-muted: #e5c89033; /* yellow at 20% */
+    --fran-note-bg-control: #414559;           /* surface0 */
+    --fran-note-bg-control-hover: #51566c;     /* surface1 */
+    --fran-note-selection: #ea999c40;          /* maroon at 25% */
+
+    /* Borders */
+    --fran-note-border-default: #414559;       /* surface0 */
+    --fran-note-border-muted: #414559;         /* surface0 */
+    --fran-note-border-emphasis: #51566c;      /* surface1 */
+    --fran-note-border-quote: #ea999c;         /* maroon */
+    --fran-note-border-checkbox: #a5acc9;      /* subtext0 */
+
+    /* Syntax highlighting */
+    --fran-note-syntax-comment: #a5acc9;       /* subtext0 */
+    --fran-note-syntax-function: #e5c890;      /* yellow */
+    --fran-note-syntax-important: #ef9f76;     /* peach */
+    --fran-note-syntax-keyword: #f4b8e4;       /* pink */
+    --fran-note-syntax-operator: #e78284;      /* red */
+    --fran-note-syntax-property: #99d1db;      /* sky */
+    --fran-note-syntax-punctuation: #949bb7;   /* overlay2 */
+    --fran-note-syntax-string: #a6d189;        /* green */
+    --fran-note-syntax-tag: #e78284;           /* red */
+    --fran-note-syntax-value: #babbf1;         /* lavender */
+
+    /* Buttons */
+    --fran-btn-bg: #414559;          /* surface0 */
+    --fran-btn-border: #51566c;      /* surface1 */
+    --fran-btn-fg: #949bb7;          /* overlay2 */
+    --fran-btn-text-fg: #a5acc9;     /* subtext0 */
+    --fran-btn-hover-bg: #51566c;    /* surface1 */
+    --fran-btn-hover-fg: #c6ceef;    /* text */
+    --fran-btn-focus: #ea999c;       /* maroon */
+
+    /* Mermaid diagrams */
+    --fran-diagram-bg: #232634;          /* crust */
+    --fran-diagram-fg: #c6ceef;          /* text */
+    --fran-diagram-line: #c6ceef;        /* text */
+    --fran-diagram-muted: #949bb7;       /* overlay2 */
+    --fran-diagram-surface: #303446;     /* base */
+    --fran-diagram-surface-alt: #414559; /* surface0 */
+    --fran-diagram-border: #51566c;      /* surface1 */
+    --fran-diagram-accent: #ea999c;      /* maroon */
+    --fran-diagram-error: #e78284;       /* red */
+    --fran-diagram-backdrop: #292c3c66;  /* mantle at 40%: AnuPpuccin's modal cover */
   }
 }
 
@@ -400,18 +656,18 @@ settings:
   --color-base-100: var(--fran-note-fg-default);
 
   /* Extended colors, which callouts use */
-  --color-red-rgb: var(--fran-note-danger-rgb);
-  --color-red: rgb(var(--fran-note-danger-rgb));
-  --color-orange-rgb: var(--fran-note-severe-rgb);
-  --color-orange: rgb(var(--fran-note-severe-rgb));
-  --color-yellow-rgb: var(--fran-note-attention-rgb);
-  --color-yellow: rgb(var(--fran-note-attention-rgb));
-  --color-green-rgb: var(--fran-note-success-rgb);
-  --color-green: rgb(var(--fran-note-success-rgb));
-  --color-blue-rgb: var(--fran-note-accent-rgb);
-  --color-blue: rgb(var(--fran-note-accent-rgb));
-  --color-purple-rgb: var(--fran-note-done-rgb);
-  --color-purple: rgb(var(--fran-note-done-rgb));
+  --color-red-rgb: var(--fran-note-red-rgb);
+  --color-red: rgb(var(--fran-note-red-rgb));
+  --color-orange-rgb: var(--fran-note-orange-rgb);
+  --color-orange: rgb(var(--fran-note-orange-rgb));
+  --color-yellow-rgb: var(--fran-note-yellow-rgb);
+  --color-yellow: rgb(var(--fran-note-yellow-rgb));
+  --color-green-rgb: var(--fran-note-green-rgb);
+  --color-green: rgb(var(--fran-note-green-rgb));
+  --color-blue-rgb: var(--fran-note-blue-rgb);
+  --color-blue: rgb(var(--fran-note-blue-rgb));
+  --color-purple-rgb: var(--fran-note-purple-rgb);
+  --color-purple: rgb(var(--fran-note-purple-rgb));
   --color-cyan-rgb: var(--fran-note-cyan-rgb);
   --color-cyan: rgb(var(--fran-note-cyan-rgb));
 
@@ -446,8 +702,9 @@ settings:
   --text-selection: var(--fran-note-selection);
   --text-highlight-bg: var(--fran-note-bg-attention-muted);
 
-  /* Buttons and controls. Accent-filled ones (checkboxes) use GitHub's
-     emphasis blue, which keeps white text readable in dark mode. */
+  /* Buttons and controls. Accent-filled ones (checkboxes) use the
+     accent's emphasis shade: GitHub's darker blue keeps white text
+     readable in dark mode. */
   --interactive-normal: var(--fran-note-bg-control);
   --interactive-hover: var(--fran-note-bg-control-hover);
   --interactive-accent: var(--fran-note-bg-accent-emphasis);
@@ -457,25 +714,33 @@ settings:
      both reading view (Prism) and the editor (CodeMirror). */
   --code-normal: var(--fran-note-fg-default);
   --code-comment: var(--fran-note-syntax-comment);
-  --code-function: var(--fran-note-syntax-entity);
-  --code-important: var(--fran-note-syntax-variable);
+  --code-function: var(--fran-note-syntax-function);
+  --code-important: var(--fran-note-syntax-important);
   --code-keyword: var(--fran-note-syntax-keyword);
-  --code-operator: var(--fran-note-syntax-keyword);
-  --code-property: var(--fran-note-syntax-constant);
-  --code-punctuation: var(--fran-note-fg-default);
+  --code-operator: var(--fran-note-syntax-operator);
+  --code-property: var(--fran-note-syntax-property);
+  --code-punctuation: var(--fran-note-syntax-punctuation);
   --code-string: var(--fran-note-syntax-string);
-  --code-tag: var(--fran-note-syntax-entity-tag);
-  --code-value: var(--fran-note-syntax-constant);
+  --code-tag: var(--fran-note-syntax-tag);
+  --code-value: var(--fran-note-syntax-value);
   --code-background: var(--fran-note-bg-muted);
 
   /* Markdown colors */
-  --blockquote-border-color: var(--fran-note-border-default);
-  --blockquote-color: var(--fran-note-fg-muted);
+  --h1-color: var(--fran-note-fg-h1);
+  --h2-color: var(--fran-note-fg-h2);
+  --h3-color: var(--fran-note-fg-h3);
+  --h4-color: var(--fran-note-fg-h4);
+  --h5-color: var(--fran-note-fg-h5);
+  --h6-color: var(--fran-note-fg-h6);
+  --bold-color: var(--fran-note-fg-bold);
+  --italic-color: var(--fran-note-fg-italic);
+  --blockquote-border-color: var(--fran-note-border-quote);
+  --blockquote-color: var(--fran-note-fg-quote);
+  --blockquote-background-color: var(--fran-note-bg-quote);
   --hr-color: var(--fran-note-border-default);
   --table-border-color: var(--fran-note-border-default);
   --embed-border-start: 0.25em solid var(--fran-note-border-default);
-  --list-marker-color: var(--fran-note-fg-default);
-  --h6-color: var(--fran-note-fg-muted);
+  --list-marker-color: var(--fran-note-fg-list-marker);
 
   --tag-color: var(--color-accent);
   --tag-color-hover: var(--fran-note-fg-on-emphasis);
@@ -484,7 +749,7 @@ settings:
 
   --checkbox-color: var(--fran-note-bg-accent-emphasis);
   --checkbox-color-hover: var(--fran-note-bg-accent-emphasis);
-  --checkbox-border-color: var(--fran-note-border-emphasis);
+  --checkbox-border-color: var(--fran-note-border-checkbox);
   --checkbox-border-color-hover: var(--fran-note-fg-muted);
   --checkbox-marker-color: var(--fran-note-fg-on-emphasis);
   /* Completed tasks keep the normal text color, as on GitHub; Obsidian
@@ -646,6 +911,16 @@ settings:
   color-scheme: var(--fran-note-color-scheme);
 }
 
+/* The app's color scheme, which the rule below reads. Obsidian has no
+   variable for it. */
+.theme-light {
+  --fran-app-color-scheme: light;
+}
+
+.theme-dark {
+  --fran-app-color-scheme: dark;
+}
+
 /* A note shows the background of the UI around it (a sidebar, a hover
    preview, a canvas card), except in a tab in the main area, where Obsidian
    gives .view-content the note's. When notes are in the other color scheme
@@ -656,6 +931,14 @@ settings:
   :is(.workspace-leaf-content[data-type="markdown"] > .view-content, .markdown-rendered, .markdown-source-view):not(:is(.workspace-leaf-content[data-type="markdown"] > .view-content, .markdown-rendered, .markdown-source-view) *) {
     background-color: var(--background-primary);
   }
+}
+
+/* A note being printed (body > .print) is in the PDFs' color scheme, which the rule above
+   doesn't see: it compares the notes'. Obsidian's export prints from a light window, so a
+   note in a dark scheme would put light text on white. A printed note always draws its own
+   background. */
+body > .print > .markdown-rendered {
+  background-color: var(--background-primary);
 }
 
 /* ==========================================================================
@@ -671,9 +954,14 @@ body {
      pre: scroll sideways (GitHub). pre-wrap: wrap. */
   --code-white-space: pre;
 
-  /* Notes' color scheme, apart from the app's. auto: the app's. light or
-     dark: that one, whatever the app's. Anything else counts as auto. */
-  --fran-note-color-mode: auto;
+  /* Notes' color scheme, whatever the app's: github-light, github-dark,
+     anuppuccin-latte or anuppuccin-frappe (11-palette-note.css). Anything
+     else counts as github-light. */
+  --fran-note-color-mode: github-light;
+
+  /* The color scheme of notes exported to PDF, by Obsidian or fran-pdf,
+     whatever the notes' own: the same values. */
+  --fran-pdf-color-mode: github-light;
 }
 
 /* ==========================================================================
@@ -782,14 +1070,15 @@ body {
 
 /* --- Code ---------------------------------------------------------------- */
 
-/* Inline code sits on a translucent gray, not the code block color */
+/* Inline code has a background of its own, which on GitHub is a
+   translucent gray, not the code block color */
 .markdown-rendered :not(pre) > code {
   padding: 0.2em 0.4em;
-  background-color: var(--fran-note-bg-neutral-muted);
+  background-color: var(--fran-note-bg-code-inline);
 }
 
 .cm-s-obsidian span.cm-inline-code {
-  background-color: var(--fran-note-bg-neutral-muted);
+  background-color: var(--fran-note-bg-code-inline);
 }
 
 /* Code blocks in reading view. The <code> scrolls instead of the <pre>, so
@@ -928,7 +1217,7 @@ body {
 }
 
 .markdown-rendered tbody tr:nth-child(even) {
-  background-color: var(--fran-note-bg-muted);
+  background-color: var(--fran-note-bg-table-stripe);
 }
 
 /* A table that scrolls sideways fades into the page at each edge it has
@@ -1037,5 +1326,32 @@ body {
 .callout[data-callout="caution"] {
   --callout-color: var(--callout-error);
   --callout-icon: lucide-octagon-alert;
+}
+
+/* ==========================================================================
+   Print: notes exported to PDF
+   --------------------------------------------------------------------------
+   By Obsidian or the fran-pdf plugin. Their color scheme is chosen in
+   11-palette-note.css. A page can't scroll, so what scrolls sideways in a
+   note wraps on paper instead, whatever --code-white-space says, and its
+   edge fades have nothing left to fade.
+   ========================================================================== */
+
+@media print {
+  /* Long code lines, and long words in them, as Prism wraps them on screen
+     with pre-wrap */
+  .markdown-rendered pre > code {
+    white-space: pre-wrap;
+    overflow-wrap: break-word;
+  }
+
+  /* A table too wide for the page breaks its cells' long words (IDs,
+     URLs). anywhere, unlike break-word, also lets the table narrow to fit,
+     since a table is as wide as its cells' longest unbreakable text. It
+     narrows as far as Obsidian's minimum column width lets it; fran-pdf
+     also lifts that on a table that doesn't fit. */
+  .markdown-rendered :is(th, td) {
+    overflow-wrap: anywhere;
+  }
 }
 

@@ -1,0 +1,10 @@
+{
+  "id": "fran-pdf",
+  "name": "Fran PDF",
+  "version": "0.1.0",
+  "minAppVersion": "1.13.0",
+  "description": "Exports a note to PDF as reading view shows it, laid out at the same width and scaled to fit an A4 page, with its diagrams.",
+  "author": "Fran",
+  "authorUrl": "https://github.com/ffyeins",
+  "isDesktopOnly": true
+}

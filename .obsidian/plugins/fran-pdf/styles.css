@@ -1,0 +1,35 @@
+/* fran-pdf: the page it prints, which main.js renders the note into. Obsidian's print styles
+   hide everything else in the window. */
+
+/* Laid out as wide as reading view lays out a note with readable line length, and the PDF's
+   page is scaled to fit it. The page's margins take the place of the note's. The note draws
+   its own background, which main.js also gives the rest of the page. */
+.fran-pdf {
+  width: var(--file-line-width);
+}
+
+.fran-pdf > .markdown-preview-view {
+  padding: 0;
+  background-color: var(--background-primary);
+}
+
+/* Obsidian sets text-rendering: optimizeLegibility on body. On screen it changes nothing, but
+   printed, Chromium then draws SF at its default optical size instead of the one for the
+   text's size, so headings come out wider and looser than in the note. auto prints them as on
+   screen. */
+@media print {
+  .fran-pdf {
+    text-rendering: auto;
+  }
+}
+
+/* On screen it's there only to be laid out, so diagrams and images get their size: kept out
+   of the way of the app, and hidden */
+@media screen {
+  .fran-pdf {
+    position: fixed;
+    top: 0;
+    left: 0;
+    visibility: hidden;
+  }
+}

@@ -150,6 +150,14 @@ body {
   margin: 0 auto;
 }
 
+/* On paper, a diagram stays on one page. The height limit, when it's in vh, is then a share
+   of the page's height. */
+@media print {
+  .fran-diagram {
+    break-inside: avoid;
+  }
+}
+
 .fran-diagram-tools {
   position: absolute;
   top: 8px;
