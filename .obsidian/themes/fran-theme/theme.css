@@ -1353,5 +1353,22 @@ body {
   .markdown-rendered :is(th, td) {
     overflow-wrap: anywhere;
   }
+
+  /* No table scrolls, so the fades' mask goes. Chromium prints a masked
+     element, and a blended one with the note around it, as a group whose
+     box starts at the note's left edge. macOS's PDF renderer (Preview's)
+     cuts what's in the box's first screen pixel: a table's 1px left border
+     all but disappears at 1.5 screen pixels per point or fewer. */
+  .markdown-rendered .el-table {
+    mask-image: none;
+  }
+
+  /* Callouts have no background, so their blend mode changes nothing on
+     the page: GitHub light darkens onto white, GitHub dark lightens onto
+     near black, and the AnuPpuccin schemes don't blend. Unblended, they
+     don't make the whole note a group (above). */
+  .markdown-rendered {
+    --callout-blend-mode: normal;
+  }
 }
 

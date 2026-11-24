@@ -4,21 +4,21 @@
     "type": "split",
     "children": [
       {
-        "id": "48064f70be3ed028",
+        "id": "5d287a8c794a0693",
         "type": "tabs",
         "children": [
           {
-            "id": "d9d84fe1c63558f3",
+            "id": "6252ef6ff65b8d2d",
             "type": "leaf",
             "state": {
               "type": "markdown",
               "state": {
-                "file": "test.md",
+                "file": "pdf_export_test.md",
                 "mode": "preview",
                 "source": true
               },
               "icon": "lucide-file",
-              "title": "test"
+              "title": "pdf_export_test"
             }
           }
         ]
@@ -202,10 +202,18 @@
       "table-editor-obsidian:Advanced Tables Toolbar": false
     }
   },
-  "active": "d9d84fe1c63558f3",
+  "active": "6252ef6ff65b8d2d",
   "lastOpenFiles": [
-    "mermaid.md",
+    "fran-pdf-table-probe.md",
     "test.md",
+    "pdf_export_test.md",
+    "mermaid.md",
+    "fran-pdf-save-check.md",
+    "print-check.md",
+    "print-check.svg",
+    "fran-stripe-test.md",
+    "fran-heading-test.md",
+    "fran-scheme-test.md",
     "fran-fade-test.md",
     "README.md",
     "fran-probe-overflow.md",
@@ -214,7 +222,6 @@
     "fran-scheme-test.canvas",
     "fran-scheme-host.md",
     "fran-scheme-target.md",
-    "fran-scheme-test.md",
     "fran-probe.md",
     "fran-options-test-1795055855749.md",
     "fran-tool-test.md",
